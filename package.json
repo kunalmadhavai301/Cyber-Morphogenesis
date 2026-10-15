@@ -4,9 +4,9 @@
   "description": "Cyber Morphogenesis: Causal Discovery and Counterfactual Defense Against Coordinated Multi-Agent Attacks in Dynamic Cyber Systems",
   "private": true,
   "scripts": {
-    "build": "npm run build --prefix frontend",
+    "build": "npm install --prefix frontend && npm run build --prefix frontend",
+    "vercel-build": "npm install --prefix frontend && npm run build --prefix frontend",
     "test": "npm test --prefix frontend",
-    "dev": "npm run dev --prefix frontend",
-    "vercel-build": "npm run build --prefix frontend"
+    "dev": "npm run dev --prefix frontend"
   }
 }
