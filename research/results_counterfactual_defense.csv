@@ -1,0 +1,6 @@
+Policy Key,Defense Intervention Policy,ASR (%),Affected Hosts,TTC (s),SDR Cost / Impact (%)
+policy_1_baseline,Baseline (No Intervention / Status Quo),27.0,3.63,26.35,0.0
+policy_2_isolate_dmz1,do(Isolate DMZ Host 1),29.0,3.67,27.08,9.98
+policy_3_throttle_gateway,do(Throttle Gateway & Dynamic Timeout),10.3,2.51,17.52,2.98
+policy_4_isolate_admin,do(Isolate Admin PC),27.1,3.69,27.51,21.57
+policy_5_joint_defense,Cyber Morphogenesis Joint Defense,9.6,2.49,17.57,5.01

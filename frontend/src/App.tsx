@@ -1,128 +1,84 @@
 import React from 'react';
-import { AppProvider, useApp } from './context/AppContext';
-import { Sidebar } from './components/layout/Sidebar';
-import { TopHeader } from './components/layout/TopHeader';
-import { MobileNav } from './components/layout/MobileNav';
-import { OfflineBanner } from './components/layout/OfflineBanner';
-import { GlobalSearchModal } from './components/modals/GlobalSearchModal';
-import { AskBhashaSetuModal } from './components/modals/AskBhashaSetuModal';
+import { SimulationProvider } from './context/SimulationContext';
+import { AgentSecurityProvider, useAgentSecurity } from './context/AgentSecurityContext';
+import { Navbar } from './components/layout/Navbar';
+import { ProvenanceBanner } from './components/layout/ProvenanceBanner';
+import { Footer } from './components/layout/Footer';
 
+// AI Agent Security Platform Pages
 import { LandingPage } from './pages/LandingPage';
 import { DashboardPage } from './pages/DashboardPage';
-import { LiveTranslatePage } from './pages/LiveTranslatePage';
-import { TranslationStudioPage } from './pages/TranslationStudioPage';
-import { UniversalLessonPage } from './pages/UniversalLessonPage';
-import { ClassroomModePage } from './pages/ClassroomModePage';
-import { WorksheetStudioPage } from './pages/WorksheetStudioPage';
-import { FlashcardStudioPage } from './pages/FlashcardStudioPage';
-import { StoryStudioPage } from './pages/StoryStudioPage';
-import { LearningGamesPage } from './pages/LearningGamesPage';
-import { EveryChildPage } from './pages/EveryChildPage';
-import { NipunAlignmentPage } from './pages/NipunAlignmentPage';
-import { AnalyticsPage } from './pages/AnalyticsPage';
-import { DiagnosticsPage } from './pages/DiagnosticsPage';
-import { SyncCenterPage } from './pages/SyncCenterPage';
-import { OfflinePacksPage } from './pages/OfflinePacksPage';
-import { MyLibraryPage } from './pages/MyLibraryPage';
-import { TeacherLearnPage } from './pages/TeacherLearnPage';
-import { VisualDescriptionPage } from './pages/VisualDescriptionPage';
-import { StudentModePage } from './pages/StudentModePage';
-import { ArchitecturePage } from './pages/ArchitecturePage';
-import { AdminDashboardPage } from './pages/AdminDashboardPage';
+import { AgentsPage } from './pages/AgentsPage';
+import { AgentNetworkPage } from './pages/AgentNetworkPage';
+import { MonitoringPage } from './pages/MonitoringPage';
+import { ThreatDetectionPage } from './pages/ThreatDetectionPage';
+import { PropagationPage } from './pages/PropagationPage';
+import { DefensePage } from './pages/DefensePage';
+import { PoliciesPage } from './pages/PoliciesPage';
+import { PermissionsPage } from './pages/PermissionsPage';
+import { IncidentsPage } from './pages/IncidentsPage';
+import { AuditPage } from './pages/AuditPage';
 import { SettingsPage } from './pages/SettingsPage';
 
-const MainLayout: React.FC = () => {
-  const { activeTab } = useApp();
+const AppContent: React.FC = () => {
+  const { currentPath } = useAgentSecurity();
 
-  const renderPage = () => {
-    switch (activeTab) {
-      case 'landing':
+  const renderActivePage = () => {
+    switch (currentPath) {
+      case '/':
         return <LandingPage />;
-      case 'dashboard':
+      case '/dashboard':
         return <DashboardPage />;
-      case 'live-translate':
-        return <LiveTranslatePage />;
-      case 'translation-studio':
-        return <TranslationStudioPage />;
-      case 'universal-lesson':
-        return <UniversalLessonPage />;
-      case 'classroom-mode':
-        return <ClassroomModePage />;
-      case 'worksheets':
-        return <WorksheetStudioPage />;
-      case 'flashcards':
-        return <FlashcardStudioPage />;
-      case 'stories':
-        return <StoryStudioPage />;
-      case 'learning-games':
-        return <LearningGamesPage />;
-      case 'everychild':
-        return <EveryChildPage />;
-      case 'nipun-alignment':
-        return <NipunAlignmentPage />;
-      case 'analytics':
-        return <AnalyticsPage />;
-      case 'diagnostics':
-        return <DiagnosticsPage />;
-      case 'sync':
-        return <SyncCenterPage />;
-      case 'offline-packs':
-        return <OfflinePacksPage />;
-      case 'my-library':
-        return <MyLibraryPage />;
-      case 'teacher-learn':
-        return <TeacherLearnPage />;
-      case 'visual-description':
-        return <VisualDescriptionPage />;
-      case 'student-mode':
-        return <StudentModePage />;
-      case 'architecture':
-        return <ArchitecturePage />;
-      case 'admin':
-        return <AdminDashboardPage />;
-      case 'settings':
+      case '/agents':
+        return <AgentsPage />;
+      case '/agent-network':
+        return <AgentNetworkPage />;
+      case '/monitoring':
+        return <MonitoringPage />;
+      case '/threat-detection':
+        return <ThreatDetectionPage />;
+      case '/propagation':
+        return <PropagationPage />;
+      case '/defense':
+        return <DefensePage />;
+      case '/policies':
+        return <PoliciesPage />;
+      case '/permissions':
+        return <PermissionsPage />;
+      case '/incidents':
+        return <IncidentsPage />;
+      case '/audit':
+        return <AuditPage />;
+      case '/settings':
         return <SettingsPage />;
-      default:
+      // Fallback aliases
+      case '/agent-security':
         return <DashboardPage />;
+      default:
+        return <LandingPage />;
     }
   };
 
-  if (activeTab === 'student-mode') {
-    return <StudentModePage />;
-  }
-
   return (
-    <div className="min-h-screen bg-ivory-50 flex text-slate-900 font-sans selection:bg-sal-200 selection:text-sal-900">
-      {/* Sidebar - Desktop */}
-      <div className="hidden md:block">
-        <Sidebar />
-      </div>
+    <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col font-sans selection:bg-cyan-500/30 selection:text-cyan-200">
+      <Navbar />
+      <ProvenanceBanner />
+      
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 pt-6">
+        {renderActivePage()}
+      </main>
 
-      {/* Main Container */}
-      <div className="flex-1 md:pl-64 flex flex-col min-w-0">
-        <TopHeader />
-
-        {/* Page Content */}
-        <main className="flex-1 pt-20 px-4 sm:px-8 max-w-7xl w-full mx-auto">
-          <OfflineBanner />
-          {renderPage()}
-        </main>
-      </div>
-
-      {/* Mobile Navigation */}
-      <MobileNav />
-
-      {/* Global Modals */}
-      <GlobalSearchModal />
-      <AskBhashaSetuModal />
+      <Footer />
     </div>
   );
 };
 
 export default function App() {
   return (
-    <AppProvider>
-      <MainLayout />
-    </AppProvider>
+    <SimulationProvider>
+      <AgentSecurityProvider>
+        <AppContent />
+      </AgentSecurityProvider>
+    </SimulationProvider>
   );
 }

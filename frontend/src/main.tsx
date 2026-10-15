@@ -8,7 +8,7 @@ if ('serviceWorker' in navigator && window.location.protocol === 'https:') {
   window.addEventListener('load', () => {
     navigator.serviceWorker
       .register('/sw.js')
-      .then((reg) => console.log('BhashaSetu ServiceWorker registered:', reg.scope))
+      .then((reg) => console.log('Cyber Morphogenesis ServiceWorker registered:', reg.scope))
       .catch((err) => console.log('ServiceWorker registration failed:', err));
   });
 }

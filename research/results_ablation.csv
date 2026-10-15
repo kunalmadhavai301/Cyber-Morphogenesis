@@ -1,0 +1,5 @@
+Configuration,F1-Score,Precision (%),Recall (%),ASR Drop%,False Alarm Rate
+Full Cyber Morphogenesis Framework,96.84%,97.41%,96.28%,83.45%,0.12%
+w/o Causal Discovery (Correlation Only),84.15%,78.30%,91.02%,52.10%,4.65%
+w/o Temporal Graph Dynamics (Static),88.60%,89.20%,88.01%,61.20%,1.85%
+w/o Counterfactual Reasoning (Heuristic),96.10%,96.80%,95.40%,44.80%,0.14%

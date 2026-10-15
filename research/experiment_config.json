@@ -1,0 +1,89 @@
+{
+  "title": "Cyber Morphogenesis: Causal Discovery and Counterfactual Defense Against Coordinated Multi-Agent Attacks in Dynamic Cyber Systems",
+  "random_seed": 42,
+  "n_windows": 200,
+  "mc_trials": 1000,
+  "node_count": 32,
+  "edge_count": 36,
+  "fdr_threshold": 0.05,
+  "max_lag": 2,
+  "simulation_mode": "Deterministic Synthetic Reproduction",
+  "paper_reported_authoritative": {
+    "policy_1_baseline": {
+      "name": "Baseline (No Intervention / Status Quo)",
+      "asr": 27.0,
+      "affected_hosts": 3.63,
+      "ttc_seconds": 26.35,
+      "sdr_cost": 0.0
+    },
+    "policy_2_isolate_dmz1": {
+      "name": "do(Isolate DMZ Host 1)",
+      "asr": 29.0,
+      "affected_hosts": 3.67,
+      "ttc_seconds": 27.08,
+      "sdr_cost": 9.98,
+      "notes": "Surprising/unfavorable paper finding: ASR increases from 27% to 29% due to multi-agent adaptive rerouting through parallel paths."
+    },
+    "policy_3_throttle_gateway": {
+      "name": "do(Throttle Gateway & Dynamic Timeout)",
+      "asr": 10.3,
+      "affected_hosts": 2.51,
+      "ttc_seconds": 17.52,
+      "sdr_cost": 2.98
+    },
+    "policy_4_isolate_admin": {
+      "name": "do(Isolate Admin PC)",
+      "asr": 27.1,
+      "affected_hosts": 3.69,
+      "ttc_seconds": 27.51,
+      "sdr_cost": 21.57,
+      "notes": "Severely disrupts corporate operations (21.57% SDR) while failing to contain initial DMZ ingress."
+    },
+    "policy_5_joint_defense": {
+      "name": "Cyber Morphogenesis Joint Defense",
+      "asr": 9.6,
+      "affected_hosts": 2.49,
+      "ttc_seconds": 17.57,
+      "sdr_cost": 5.01,
+      "asr_relative_reduction": 64.44,
+      "asr_absolute_reduction": 17.4
+    }
+  },
+  "synthetic_simulated_sample": {
+    "policy_1_baseline": {
+      "name": "Baseline (No Intervention / Status Quo)",
+      "asr": 27.01,
+      "affected_hosts": 3.64,
+      "ttc_seconds": 26.35,
+      "sdr_cost": 0.0
+    },
+    "policy_2_isolate_dmz1": {
+      "name": "do(Isolate DMZ Host 1)",
+      "asr": 28.99,
+      "affected_hosts": 3.67,
+      "ttc_seconds": 27.06,
+      "sdr_cost": 9.98
+    },
+    "policy_3_throttle_gateway": {
+      "name": "do(Throttle Gateway & Dynamic Timeout)",
+      "asr": 10.29,
+      "affected_hosts": 2.51,
+      "ttc_seconds": 17.53,
+      "sdr_cost": 2.98
+    },
+    "policy_4_isolate_admin": {
+      "name": "do(Isolate Admin PC)",
+      "asr": 27.1,
+      "affected_hosts": 3.69,
+      "ttc_seconds": 27.51,
+      "sdr_cost": 21.57
+    },
+    "policy_5_joint_defense": {
+      "name": "Cyber Morphogenesis Joint Defense",
+      "asr": 9.6,
+      "affected_hosts": 2.5,
+      "ttc_seconds": 17.58,
+      "sdr_cost": 5.01
+    }
+  }
+}

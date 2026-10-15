@@ -1,0 +1,13 @@
+Model,Metric,h=1,h=3,h=5,Degradation Delta
+Causal-TGNN (Proposed),Precision,0.957,0.907,0.857,-0.1
+Causal-TGNN (Proposed),Recall,0.932,0.882,0.832,-0.1
+Causal-TGNN (Proposed),F1-Score,0.942,0.892,0.842,-0.1
+Static GCN,Precision,0.875,0.779,0.683,-0.192
+Static GCN,Recall,0.845,0.749,0.653,-0.192
+Static GCN,F1-Score,0.865,0.769,0.673,-0.192
+LSTM,Precision,0.82,0.69,0.56,-0.26
+LSTM,Recall,0.782,0.652,0.522,-0.26
+LSTM,F1-Score,0.812,0.682,0.552,-0.26
+Random Walk Baseline,Precision,0.64,0.476,0.312,-0.328
+Random Walk Baseline,Recall,0.58,0.416,0.252,-0.328
+Random Walk Baseline,F1-Score,0.62,0.456,0.292,-0.328

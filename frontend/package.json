@@ -1,20 +1,24 @@
 {
-  "name": "bhashasetu-ai",
+  "name": "cyber-morphogenesis",
   "private": true,
   "version": "1.0.0",
+  "description": "Interactive Research Visualization and Defense Platform for Cyber Morphogenesis",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "test": "node test-suite.js",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
   "dependencies": {
     "@types/canvas-confetti": "^1.9.0",
+    "@types/katex": "^0.16.8",
     "axios": "^1.7.2",
     "canvas-confetti": "^1.9.4",
     "clsx": "^2.1.1",
     "framer-motion": "^13.3.0",
+    "katex": "^0.19.0",
     "lucide-react": "^0.395.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

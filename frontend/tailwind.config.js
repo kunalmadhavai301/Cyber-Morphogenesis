@@ -8,70 +8,47 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Deep Sal Forest Green (Jharkhand Natural Colors)
-        sal: {
-          50: '#f2f9f4',
-          100: '#e1f2e5',
-          200: '#c3e5cb',
-          300: '#99cfa7',
-          400: '#69b17c',
-          500: '#46955b',
-          600: '#347746',
-          700: '#2a5e38',
-          800: '#234b2f',
-          900: '#1d3e28',
-          950: '#0d2215',
+        zinc: {
+          950: '#09090b',
+          900: '#121215',
+          850: '#18181b',
+          800: '#27272a',
+          700: '#3f3f46',
+          600: '#52525b',
+          400: '#a1a1aa',
+          300: '#d4d4d8',
+          200: '#e4e4e7',
+          100: '#f4f4f5',
+          50: '#fafafa',
         },
-        // Terracotta Red Earth (Chhotanagpur Red Soil)
-        terracotta: {
-          50: '#fdf6f3',
-          100: '#fbe9e3',
-          200: '#f7d6ca',
-          300: '#eeaba2',
-          400: '#e28073',
-          500: '#d55a4a',
-          600: '#c24233',
-          700: '#a23427',
-          800: '#862e24',
-          900: '#6f2c23',
-          950: '#3c130e',
-        },
-        // Harvest Ochre Yellow
-        harvest: {
-          50: '#fefce8',
-          100: '#fef9c3',
-          200: '#fef08a',
-          300: '#fde047',
-          400: '#facc15',
-          500: '#eab308',
-          600: '#ca8a04',
-          700: '#a16207',
-        },
-        // Sohrai Art Cream Ivory
-        ivory: {
-          50: '#fdfbf7',
-          100: '#f9f5eb',
-          200: '#f2e8d5',
-          300: '#e7d6b8',
-          400: '#d7bc91',
-        },
-        // Tribal Turquoise Water
-        tribal: {
-          50: '#f0fdfa',
-          100: '#ccfbf1',
-          500: '#14b8a6',
-          700: '#0f766e',
-          800: '#115e59',
-          900: '#134e4a',
+        cyber: {
+          emerald: '#34d399',
+          rose: '#f43f5e',
+          amber: '#fbbf24',
+          cyan: '#22d3ee',
+          blue: '#60a5fa',
+          purple: '#c084fc',
         }
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-        olchiki: ['Noto Sans Ol Chiki', 'Inter', 'sans-serif'],
+        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
       },
       boxShadow: {
-        'soft': '0 4px 20px -2px rgba(29, 62, 40, 0.08)',
-        'elevated': '0 10px 30px -5px rgba(29, 62, 40, 0.12)',
+        'glow-cyan': '0 0 25px -5px rgba(34, 211, 238, 0.25)',
+        'glow-rose': '0 0 25px -5px rgba(244, 63, 94, 0.25)',
+        'glow-emerald': '0 0 25px -5px rgba(52, 211, 153, 0.25)',
+        'glow-amber': '0 0 25px -5px rgba(251, 191, 36, 0.25)',
+      },
+      animation: {
+        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'flow': 'flow 20s linear infinite',
+      },
+      keyframes: {
+        flow: {
+          '0%': { backgroundPosition: '0% 50%' },
+          '100%': { backgroundPosition: '100% 50%' },
+        }
       }
     },
   },

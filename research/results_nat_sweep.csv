@@ -1,0 +1,8 @@
+Collapse Ratio (k),Node Degree AUC,Edge Weight AUC,Causal Discovery AUC,State
+k = 1 (Full NAT),0.612,0.998,0.985,Blind vs Perfect
+k = 2,0.615,0.958,0.982,Transition
+k = 4 (Trough),0.62,0.504,0.976,Edge Chance / Crossover
+k = 8,0.635,0.61,0.978,Intermediate
+k = 16,0.69,0.612,0.98,Intermediate
+k = 64,0.968,0.61,0.984,Node Degree Recovering
+k = 128 (Visible),0.998,0.611,0.986,Visible / Plateau
