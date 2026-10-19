@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+
+{% block title %}Experiment History | ML-KEM Benchmark Platform{% endblock %}
+
+{% block content %}
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="d-flex flex-wrap justify-content-between align-items-center pb-3 border-bottom border-secondary border-opacity-25">
+            <div>
+                <h2 class="h3 fw-bold mb-1 text-white">Experiment History & Artifacts</h2>
+                <p class="text-secondary mb-0">
+                    Archived benchmark runs persisted in local SQLite database
+                </p>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="/api/benchmark/export/csv" class="btn btn-outline-custom">
+                    <i class="fa-solid fa-file-csv me-1 text-info"></i> Export Full Dataset (CSV)
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Search & Filter Controls -->
+<div class="row g-3 mb-4">
+    <div class="col-md-6">
+        <div class="input-group">
+            <span class="input-group-text bg-dark border-secondary border-opacity-25 text-secondary">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </span>
+            <input type="text" id="historySearch" class="form-control form-control-dark" placeholder="Filter by Experiment ID, parameter set, or notes..." oninput="filterHistoryTable()">
+        </div>
+    </div>
+    <div class="col-md-6 text-md-end text-secondary small align-self-center">
+        Total Recorded Experiments: <strong class="text-white">{{ experiments|length }}</strong>
+    </div>
+</div>
+
+<!-- History Table -->
+<div class="card-custom mb-4">
+    <div class="table-responsive">
+        <table class="table table-custom" id="historyTable">
+            <thead>
+                <tr>
+                    <th>Experiment ID</th>
+                    <th>Timestamp</th>
+                    <th>Parameter Set</th>
+                    <th>Operation</th>
+                    <th>Trials</th>
+                    <th>Roundtrip Median</th>
+                    <th>Notes</th>
+                    <th>Details</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if experiments %}
+                    {% for exp in experiments %}
+                    <tr id="{{ exp.experiment_id }}">
+                        <td class="font-monospace text-info small fw-semibold">{{ exp.experiment_id }}</td>
+                        <td class="text-secondary small">{{ exp.timestamp }}</td>
+                        <td>
+                            <span class="badge-param {% if exp.parameter_set == 'ML-KEM-512' %}mlkem-512{% elif exp.parameter_set == 'ML-KEM-768' %}mlkem-768{% else %}mlkem-1024{% endif %}">
+                                {{ exp.parameter_set }}
+                            </span>
+                        </td>
+                        <td><span class="badge bg-dark border border-secondary text-uppercase small">{{ exp.operation }}</span></td>
+                        <td class="font-monospace text-secondary">{{ exp.trials }}</td>
+                        <td class="font-monospace text-success fw-bold">
+                            {% if exp.roundtrip_median_us %}{{ exp.roundtrip_median_us }} µs{% else %}—{% endif %}
+                        </td>
+                        <td class="text-secondary small text-truncate" style="max-width: 200px;">{{ exp.notes or "—" }}</td>
+                        <td>
+                            <button class="btn btn-outline-custom btn-sm py-0 px-2" style="font-size: 0.78rem;" onclick="viewExperimentDetails('{{ exp.experiment_id }}')">
+                                <i class="fa-solid fa-eye me-1"></i> Inspect
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="8" class="text-center py-5 text-secondary">
+                            <i class="fa-solid fa-box-open fa-2x mb-3 text-secondary opacity-50"></i>
+                            <p class="mb-2">No experiments found in database.</p>
+                            <a href="{{ url_for('benchmark') }}" class="btn btn-primary-custom btn-sm">
+                                Run a Benchmark
+                            </a>
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Details Modal -->
+<div class="modal fade" id="expModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content bg-dark border border-secondary">
+            <div class="modal-header border-secondary border-opacity-25">
+                <h5 class="modal-title text-white" id="modalTitle">Experiment Inspection</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4" id="modalBody">
+                <div class="text-center py-4">
+                    <div class="spinner-border text-info" role="status"></div>
+                </div>
+            </div>
+            <div class="modal-footer border-secondary border-opacity-25">
+                <button type="button" class="btn btn-outline-custom btn-sm" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function filterHistoryTable() {
+    const query = document.getElementById("historySearch").value.toLowerCase();
+    const rows = document.querySelectorAll("#historyTable tbody tr");
+    rows.forEach(r => {
+        const text = r.textContent.toLowerCase();
+        r.style.display = text.includes(query) ? "" : "none";
+    });
+}
+
+async function viewExperimentDetails(expId) {
+    const modal = new bootstrap.Modal(document.getElementById("expModal"));
+    modal.show();
+    document.getElementById("modalTitle").textContent = `Inspection: ${expId}`;
+    const body = document.getElementById("modalBody");
+    body.innerHTML = `<div class="text-center py-4"><div class="spinner-border text-info" role="status"></div></div>`;
+
+    try {
+        const res = await fetch(`/api/benchmark/results/${expId}`);
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+
+        const exp = data.experiment;
+        let opsHtml = "";
+        for (const [opName, stats] of Object.entries(exp.operations || {})) {
+            opsHtml += `
+                <div class="p-3 mb-3 rounded bg-black border border-secondary border-opacity-25">
+                    <h6 class="text-info text-capitalize fw-bold mb-2">${opName} Operation</h6>
+                    <div class="row g-2 small">
+                        <div class="col-sm-3 text-secondary">Mean: <strong class="text-white">${stats.mean_us} µs</strong></div>
+                        <div class="col-sm-3 text-secondary">Median: <strong class="text-success">${stats.median_us} µs</strong></div>
+                        <div class="col-sm-3 text-secondary">P95: <strong class="text-warning">${stats.p95_us} µs</strong></div>
+                        <div class="col-sm-3 text-secondary">Throughput: <strong class="text-white">${stats.throughput_ops_sec.toLocaleString()} ops/s</strong></div>
+                        <div class="col-sm-4 text-secondary">Std Dev: <strong class="text-secondary">&plusmn;${stats.std_dev_us} µs</strong></div>
+                        <div class="col-sm-4 text-secondary">Min/Max: <strong class="text-secondary">${stats.min_us} / ${stats.max_us} µs</strong></div>
+                        <div class="col-sm-4 text-secondary">95% CI: <strong class="text-secondary">[${stats.ci95_lower_us}, ${stats.ci95_upper_us}] µs</strong></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        body.innerHTML = `
+            <div class="mb-3 small text-secondary">
+                <div><strong>Timestamp:</strong> ${exp.timestamp}</div>
+                <div><strong>Parameter Set:</strong> ${exp.parameter_set} &bull; <strong>Trials:</strong> ${exp.trials} &bull; <strong>Warmup:</strong> ${exp.warmup}</div>
+                <div><strong>System OS:</strong> ${exp.os_info || "—"} &bull; <strong>Python:</strong> ${exp.python_version || "—"}</div>
+                <div><strong>Crypto Engine:</strong> ${exp.crypto_engine || "—"}</div>
+                ${exp.notes ? `<div class="mt-1"><strong>Notes:</strong> ${exp.notes}</div>` : ""}
+            </div>
+            <h6 class="fw-bold text-white mb-2">Operation Measurements</h6>
+            ${opsHtml || "<div class='text-secondary'>No operation details recorded.</div>"}
+        `;
+    } catch (err) {
+        body.innerHTML = `<div class="text-danger">Failed to load experiment details: ${err.message}</div>`;
+    }
+}
+</script>
+{% endblock %}

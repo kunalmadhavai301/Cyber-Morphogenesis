@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block title %}About & Documentation | ML-KEM (FIPS 203){% endblock %}
+
+{% block content %}
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="d-flex flex-wrap justify-content-between align-items-center pb-3 border-bottom border-secondary border-opacity-25">
+            <div>
+                <h2 class="h3 fw-bold mb-1 text-white">Cryptographic Documentation & Architecture</h2>
+                <p class="text-secondary mb-0">
+                    Comprehensive technical reference for NIST FIPS 203 Module-Lattice-Based Key-Encapsulation Mechanism
+                </p>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="https://csrc.nist.gov/pubs/fips/203/final" target="_blank" rel="noopener noreferrer" class="btn btn-outline-custom">
+                    <i class="fa-solid fa-external-link me-1 text-info"></i> Official NIST FIPS 203 Standard
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Navigation Sidebar -->
+    <div class="col-lg-3">
+        <div class="card-custom sticky-top" style="top: 80px;">
+            <div class="card-header">
+                <i class="fa-solid fa-list-ol text-info me-2"></i>Contents
+            </div>
+            <div class="list-group list-group-flush bg-transparent">
+                <a href="#section-pqc" class="list-group-item list-group-item-action bg-transparent text-secondary border-secondary border-opacity-25 small py-2">
+                    1. Post-Quantum Cryptography
+                </a>
+                <a href="#section-mlkem" class="list-group-item list-group-item-action bg-transparent text-secondary border-secondary border-opacity-25 small py-2">
+                    2. ML-KEM Mechanics & Workflow
+                </a>
+                <a href="#section-parameters" class="list-group-item list-group-item-action bg-transparent text-secondary border-secondary border-opacity-25 small py-2">
+                    3. Standardized Parameter Sets
+                </a>
+                <a href="#section-implicit" class="list-group-item list-group-item-action bg-transparent text-secondary border-secondary border-opacity-25 small py-2">
+                    4. Implicit Rejection (FIPS 203 §5.3)
+                </a>
+                <a href="#section-benchmarking" class="list-group-item list-group-item-action bg-transparent text-secondary border-secondary border-opacity-25 small py-2">
+                    5. Benchmarking Methodology
+                </a>
+                <a href="#section-security" class="list-group-item list-group-item-action bg-transparent text-secondary border-secondary border-opacity-25 small py-2">
+                    6. Security Requirements & Safeguards
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="col-lg-9">
+        <!-- 1. Post-Quantum Cryptography -->
+        <div id="section-pqc" class="card-custom p-4 mb-4">
+            <h4 class="h5 fw-bold text-white mb-3">
+                <i class="fa-solid fa-atom text-info me-2"></i>1. Post-Quantum Cryptography (PQC)
+            </h4>
+            <p class="text-secondary small mb-3" style="line-height: 1.6;">
+                Classical public-key cryptography—predominantly RSA, Diffie-Hellman, and Elliptic Curve Cryptography (ECDH, ECDSA)—relies on mathematical problems such as integer factorization and the discrete logarithm problem over finite fields or elliptic curve groups. In 1994, Peter Shor demonstrated that a sufficiently capable quantum computer running Shor's algorithm solves these problems in polynomial time ($\mathcal{O}((\log N)^2)$), rendering all current asymmetric standards vulnerable.
+            </p>
+            <p class="text-secondary small mb-0" style="line-height: 1.6;">
+                <strong>Post-Quantum Cryptography</strong> encompasses cryptographic algorithms designed to run on conventional classical hardware (laptops, servers, microcontrollers) that remain secure against cryptanalysis by both classical computers and quantum computers.
+            </p>
+        </div>
+
+        <!-- 2. ML-KEM Mechanics & Workflow -->
+        <div id="section-mlkem" class="card-custom p-4 mb-4">
+            <h4 class="h5 fw-bold text-white mb-3">
+                <i class="fa-solid fa-key text-info me-2"></i>2. ML-KEM Mechanics & Key Encapsulation Workflow
+            </h4>
+            <p class="text-secondary small mb-3" style="line-height: 1.6;">
+                A Key-Encapsulation Mechanism (KEM) is a public-key cryptographic scheme specifically engineered to establish a shared symmetric secret key between two communication endpoints. Unlike classical Diffie-Hellman, ML-KEM does not require both parties to send public keys simultaneously. Instead, the protocol proceeds through three distinct phases:
+            </p>
+
+            <div class="p-3 mb-3 rounded bg-dark border border-secondary border-opacity-25 small">
+                <h6 class="text-white fw-bold mb-2">Algorithm Execution Steps (NIST FIPS 203)</h6>
+                <ol class="mb-0 text-secondary ps-3">
+                    <li class="mb-2">
+                        <strong class="text-info">Key Generation ($\text{KeyGen}$):</strong> The recipient (Alice) generates an encapsulation key $ek$ (public) and a matching decapsulation key $dk$ (private). $ek$ is published or transmitted over an insecure channel.
+                    </li>
+                    <li class="mb-2">
+                        <strong class="text-warning">Encapsulation ($\text{Encaps}$):</strong> The sender (Bob) takes $ek$ and a random seed $m$ to deterministically derive a 32-byte shared secret $K$ and an encapsulation ciphertext $c$. Bob transmits $c$ to Alice while retaining $K$.
+                    </li>
+                    <li>
+                        <strong class="text-success">Decapsulation ($\text{Decaps}$):</strong> Alice computes $K' = \text{Decaps}(dk, c)$. If $c$ was legitimate, $K' = K$, establishing mutual key agreement.
+                    </li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- 3. Standardized Parameter Sets -->
+        <div id="section-parameters" class="card-custom p-4 mb-4">
+            <h4 class="h5 fw-bold text-white mb-3">
+                <i class="fa-solid fa-cubes text-info me-2"></i>3. Standardized Parameter Sets (NIST FIPS 203)
+            </h4>
+            <p class="text-secondary small mb-3" style="line-height: 1.6;">
+                NIST FIPS 203 specifies three parameter sets with increasing lattice matrix dimensions $k$:
+            </p>
+            <div class="table-responsive">
+                <table class="table table-custom table-sm">
+                    <thead>
+                        <tr>
+                            <th>Parameter Set</th>
+                            <th>Rank ($k$)</th>
+                            <th>NIST Level</th>
+                            <th>Equivalence</th>
+                            <th>Public Key ($ek$)</th>
+                            <th>Ciphertext ($c$)</th>
+                            <th>Shared Secret</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="fw-bold text-white">ML-KEM-512</td>
+                            <td>$k=2$</td>
+                            <td>Category 1</td>
+                            <td>AES-128</td>
+                            <td class="font-monospace text-info">800 Bytes</td>
+                            <td class="font-monospace text-warning">768 Bytes</td>
+                            <td class="font-monospace text-success">32 Bytes</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold text-white">ML-KEM-768</td>
+                            <td>$k=3$</td>
+                            <td>Category 3</td>
+                            <td>AES-192</td>
+                            <td class="font-monospace text-info">1,184 Bytes</td>
+                            <td class="font-monospace text-warning">1,088 Bytes</td>
+                            <td class="font-monospace text-success">32 Bytes</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold text-white">ML-KEM-1024</td>
+                            <td>$k=4$</td>
+                            <td>Category 5</td>
+                            <td>AES-256</td>
+                            <td class="font-monospace text-info">1,568 Bytes</td>
+                            <td class="font-monospace text-warning">1,568 Bytes</td>
+                            <td class="font-monospace text-success">32 Bytes</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="text-secondary small mb-0 mt-2">
+                <strong>Recommendation:</strong> NIST recommends <strong>ML-KEM-768</strong> as the primary default parameter set for general-purpose applications, balancing robust Category 3 post-quantum security with minimal latency.
+            </p>
+        </div>
+
+        <!-- 4. Implicit Rejection -->
+        <div id="section-implicit" class="card-custom p-4 mb-4">
+            <h4 class="h5 fw-bold text-white mb-3">
+                <i class="fa-solid fa-shield-halved text-info me-2"></i>4. Implicit Rejection (FIPS 203 §5.3)
+            </h4>
+            <p class="text-secondary small mb-3" style="line-height: 1.6;">
+                In traditional public-key encryption schemes, decapsulation errors (such as invalid padding or ciphertext modification) often raise observable error signals. Attackers can exploit differences in execution time or error codes to mount chosen-ciphertext timing attacks (e.g., Bleichenbacher padding oracle attacks).
+            </p>
+            <p class="text-secondary small mb-0" style="line-height: 1.6;">
+                To counter this threat, ML-KEM adopts <strong>implicit rejection</strong>. When presented with an invalid ciphertext $c$ of the expected byte length, $\text{Decaps}(dk, c)$ does not abort. Instead, it deterministically generates a pseudorandom shared secret $K' = \text{J}(z \mathbin{\Vert} c)$, where $z$ is a 32-byte rejection seed stored securely inside $dk$. An attacker receives no observable indicator of failure, neutralizing oracle side-channels.
+            </p>
+        </div>
+
+        <!-- 5. Benchmarking Methodology -->
+        <div id="section-benchmarking" class="card-custom p-4 mb-4">
+            <h4 class="h5 fw-bold text-white mb-3">
+                <i class="fa-solid fa-stopwatch text-info me-2"></i>5. Scientific Benchmarking Methodology
+            </h4>
+            <ul class="text-secondary small mb-0 ps-3" style="line-height: 1.6;">
+                <li class="mb-2"><strong>High-Resolution Monotonic Timing:</strong> Timings are captured using Python's <code>time.perf_counter_ns()</code>, backed by the Windows <code>QueryPerformanceCounter()</code> API providing 100 ns resolution.</li>
+                <li class="mb-2"><strong>Warm-up Iterations:</strong> Configurable warm-up runs (default 20 iterations) ensure CPU branch predictor, L1/L2 data cache, and runtime memory pools stabilize before timing observations begin.</li>
+                <li class="mb-2"><strong>Dual-Layer Memory Profiling:</strong> Process memory is evaluated using <code>tracemalloc</code> (for Python-managed heap allocations) alongside OS-level process Resident Set Size (RSS via <code>psutil</code>) to account for native C/Rust library execution.</li>
+                <li><strong>Descriptive and Inferential Statistics:</strong> We compute sample size, mean, median, min, max, sample standard deviation ($ddof=1$), 95th percentile, Interquartile Range (IQR), and 95% Confidence Intervals of the mean.</li>
+            </ul>
+        </div>
+
+        <!-- 6. Security Requirements & Safeguards -->
+        <div id="section-security" class="card-custom p-4 mb-4 border-warning border-opacity-25">
+            <h4 class="h5 fw-bold text-warning mb-3">
+                <i class="fa-solid fa-triangle-exclamation me-2"></i>6. Security Requirements & Academic Disclaimer
+            </h4>
+            <p class="text-secondary small mb-2" style="line-height: 1.6;">
+                This application enforces a strict zero-secret-leakage policy:
+            </p>
+            <ul class="text-secondary small mb-3 ps-3">
+                <li>Private key material is held in ephemeral RAM only and is never serialized or returned across REST endpoints.</li>
+                <li>Shared secrets are verified in server memory using constant-time comparisons (<code>hmac.compare_digest</code>).</li>
+                <li>Demonstrations display non-revealing SHA-256 fingerprints rather than raw secret bytes.</li>
+            </ul>
+            <p class="text-muted small mb-0 fst-italic">
+                Academic Disclaimer: This platform is designed for research, academic evaluation, and cryptographic performance benchmarking. While using standards-compliant implementations of FIPS 203, it is not a certified production Key Management System (KMS) or Hardware Security Module (HSM).
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

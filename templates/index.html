@@ -1,0 +1,201 @@
+{% extends "base.html" %}
+
+{% block title %}Overview Dashboard | ML-KEM Benchmarking Platform{% endblock %}
+
+{% block content %}
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="d-flex flex-wrap justify-content-between align-items-center pb-3 border-bottom border-secondary border-opacity-25">
+            <div>
+                <h2 class="h3 fw-bold mb-1 text-white">Post-Quantum Cryptography Benchmarking</h2>
+                <p class="text-secondary mb-0">
+                    Evaluation of NIST FIPS 203 Module-Lattice-Based Key-Encapsulation Mechanism (ML-KEM)
+                </p>
+            </div>
+            <div class="d-flex gap-2 mt-2 mt-sm-0">
+                <a href="{{ url_for('demonstration') }}" class="btn btn-outline-custom">
+                    <i class="fa-solid fa-play me-1 text-info"></i> Interactive Demo
+                </a>
+                <a href="{{ url_for('benchmark') }}" class="btn btn-primary-custom">
+                    <i class="fa-solid fa-bolt me-1"></i> New Benchmark
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Metric Overview Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3 col-sm-6">
+        <div class="metric-card">
+            <div class="metric-label">Total Benchmark Runs</div>
+            <div class="metric-value">{{ summary.total_benchmark_runs }}</div>
+            <div class="metric-sub">
+                <i class="fa-solid fa-database me-1"></i> SQLite Persisted Runs
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+        <div class="metric-card green">
+            <div class="metric-label">KeyGen Median Latency</div>
+            <div class="metric-value">
+                {% if summary.median_latencies.keygen_median_us %}
+                    {{ summary.median_latencies.keygen_median_us }} <span class="fs-6 fw-normal text-secondary">µs</span>
+                {% else %}
+                    <span class="fs-5 text-secondary">No Data</span>
+                {% endif %}
+            </div>
+            <div class="metric-sub">
+                <i class="fa-solid fa-clock me-1"></i> Latest Benchmark Trial
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+        <div class="metric-card amber">
+            <div class="metric-label">Encaps Median Latency</div>
+            <div class="metric-value">
+                {% if summary.median_latencies.encaps_median_us %}
+                    {{ summary.median_latencies.encaps_median_us }} <span class="fs-6 fw-normal text-secondary">µs</span>
+                {% else %}
+                    <span class="fs-5 text-secondary">No Data</span>
+                {% endif %}
+            </div>
+            <div class="metric-sub">
+                <i class="fa-solid fa-arrow-right-to-bracket me-1"></i> Public-Key Encapsulation
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+        <div class="metric-card indigo">
+            <div class="metric-label">Decaps Median Latency</div>
+            <div class="metric-value">
+                {% if summary.median_latencies.decaps_median_us %}
+                    {{ summary.median_latencies.decaps_median_us }} <span class="fs-6 fw-normal text-secondary">µs</span>
+                {% else %}
+                    <span class="fs-5 text-secondary">No Data</span>
+                {% endif %}
+            </div>
+            <div class="metric-sub">
+                <i class="fa-solid fa-arrow-right-from-bracket me-1"></i> Private-Key Recovery
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Parameter Sets Grid -->
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <h4 class="h5 fw-bold text-white mb-3">
+            <i class="fa-solid fa-cubes text-info me-2"></i>Standardized Parameter Sets (NIST FIPS 203)
+        </h4>
+    </div>
+    {% for name, param in parameters.items() %}
+    <div class="col-lg-4 col-md-6">
+        <div class="card-custom h-100 p-3">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <span class="badge-param {% if name == 'ML-KEM-512' %}mlkem-512{% elif name == 'ML-KEM-768' %}mlkem-768{% else %}mlkem-1024{% endif %}">
+                    {{ name }}
+                </span>
+                <span class="badge bg-secondary-subtle border border-secondary text-secondary">
+                    NIST Category {{ param.nist_category }}
+                </span>
+            </div>
+            <h5 class="fw-bold text-white mb-1">{{ param.classical_security_equiv }} Equivalence</h5>
+            <p class="text-secondary small mb-3">{{ param.description }}</p>
+            
+            <div class="p-2 rounded bg-dark border border-secondary border-opacity-25 small mb-3">
+                <div class="d-flex justify-content-between py-1 border-bottom border-secondary border-opacity-25">
+                    <span class="text-muted">Module Rank ($k$):</span>
+                    <span class="font-monospace text-white">{{ param.matrix_dim_k }} &times; {{ param.matrix_dim_k }}</span>
+                </div>
+                <div class="d-flex justify-content-between py-1 border-bottom border-secondary border-opacity-25">
+                    <span class="text-muted">Public Key ($ek$):</span>
+                    <span class="font-monospace text-info">{{ param.public_key_bytes }} Bytes</span>
+                </div>
+                <div class="d-flex justify-content-between py-1 border-bottom border-secondary border-opacity-25">
+                    <span class="text-muted">Private Key ($dk$):</span>
+                    <span class="font-monospace text-secondary">{{ param.private_key_bytes }} Bytes</span>
+                </div>
+                <div class="d-flex justify-content-between py-1 border-bottom border-secondary border-opacity-25">
+                    <span class="text-muted">Ciphertext ($c$):</span>
+                    <span class="font-monospace text-warning">{{ param.ciphertext_bytes }} Bytes</span>
+                </div>
+                <div class="d-flex justify-content-between py-1">
+                    <span class="text-muted">Shared Secret ($K$):</span>
+                    <span class="font-monospace text-success">{{ param.shared_secret_bytes }} Bytes</span>
+                </div>
+            </div>
+
+            <a href="{{ url_for('demonstration') }}?param={{ name }}" class="btn btn-outline-custom btn-sm w-100">
+                <i class="fa-solid fa-play me-1"></i> Test {{ name }}
+            </a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Recent Experiments Section -->
+<div class="row g-4">
+    <div class="col-12">
+        <div class="card-custom">
+            <div class="card-header">
+                <span><i class="fa-solid fa-clock-rotate-left text-info me-2"></i>Recent Benchmark Runs</span>
+                <a href="{{ url_for('history') }}" class="small text-info text-decoration-none">
+                    View Full History <i class="fa-solid fa-chevron-right ms-1"></i>
+                </a>
+            </div>
+            <div class="table-responsive">
+                {% if summary.recent_experiments %}
+                <table class="table table-custom">
+                    <thead>
+                        <tr>
+                            <th>Experiment ID</th>
+                            <th>Timestamp</th>
+                            <th>Parameter</th>
+                            <th>Operation</th>
+                            <th>Trials</th>
+                            <th>Roundtrip Median</th>
+                            <th>Notes</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for exp in summary.recent_experiments %}
+                        <tr>
+                            <td class="font-monospace text-info small">{{ exp.experiment_id }}</td>
+                            <td class="text-secondary small">{{ exp.timestamp }}</td>
+                            <td>
+                                <span class="badge-param {% if exp.parameter_set == 'ML-KEM-512' %}mlkem-512{% elif exp.parameter_set == 'ML-KEM-768' %}mlkem-768{% else %}mlkem-1024{% endif %}">
+                                    {{ exp.parameter_set }}
+                                </span>
+                            </td>
+                            <td><span class="badge bg-dark border border-secondary text-uppercase small">{{ exp.operation }}</span></td>
+                            <td class="font-monospace">{{ exp.trials }}</td>
+                            <td class="font-monospace text-success">
+                                {% if exp.roundtrip_median_us %}{{ exp.roundtrip_median_us }} µs{% else %}—{% endif %}
+                            </td>
+                            <td class="text-secondary small text-truncate" style="max-width: 200px;">{{ exp.notes or "—" }}</td>
+                            <td>
+                                <a href="{{ url_for('history') }}#{{ exp.experiment_id }}" class="btn btn-outline-custom btn-sm py-0 px-2" style="font-size: 0.75rem;">
+                                    Details
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="p-5 text-center text-secondary">
+                    <i class="fa-solid fa-chart-simple fa-3x mb-3 text-secondary opacity-50"></i>
+                    <h5 class="fw-bold text-white mb-2">No Benchmarks Recorded Yet</h5>
+                    <p class="small mb-3">No experimental runs have been executed on this machine yet. Execute your first benchmark to populate genuine measurements.</p>
+                    <a href="{{ url_for('benchmark') }}" class="btn btn-primary-custom btn-sm">
+                        <i class="fa-solid fa-stopwatch me-1"></i> Launch First Benchmark
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

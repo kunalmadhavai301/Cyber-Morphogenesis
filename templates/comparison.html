@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block title %}Comparative Analysis | ML-KEM Parameter Sets{% endblock %}
+
+{% block content %}
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="d-flex flex-wrap justify-content-between align-items-center pb-3 border-bottom border-secondary border-opacity-25">
+            <div>
+                <h2 class="h3 fw-bold mb-1 text-white">Comparative Cryptographic Analysis</h2>
+                <p class="text-secondary mb-0">
+                    Cross-parameter evaluation (ML-KEM-512 vs 768 vs 1024) and Classical ECDH baselines
+                </p>
+            </div>
+            <div class="d-flex gap-2">
+                <button id="btnRefreshComp" class="btn btn-outline-custom" onclick="comparisonView.loadAllComparisons()">
+                    <i class="fa-solid fa-arrows-rotate me-1 text-info"></i> Refresh Live Sweep
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Comparison Charts Grid -->
+<div class="row g-4 mb-4">
+    <!-- Chart 1: Latency by Parameter Set -->
+    <div class="col-lg-6">
+        <div class="card-custom h-100 p-3">
+            <h6 class="fw-bold text-white mb-1">
+                <i class="fa-solid fa-stopwatch text-info me-2"></i>Computational Latency by Parameter Set
+            </h6>
+            <p class="text-secondary small mb-3">Median latency (µs) for KeyGen, Encapsulation, and Decapsulation</p>
+            <div style="height: 280px;">
+                <canvas id="chartLatencyComp"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart 2: Wire Overhead (Sizes) -->
+    <div class="col-lg-6">
+        <div class="card-custom h-100 p-3">
+            <h6 class="fw-bold text-white mb-1">
+                <i class="fa-solid fa-network-wired text-warning me-2"></i>Communication Transmission Overhead
+            </h6>
+            <p class="text-secondary small mb-3">Public Key ($ek$) and Ciphertext ($c$) wire transmission in bytes</p>
+            <div style="height: 280px;">
+                <canvas id="chartSizeComp"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <!-- Chart 3: Throughput Comparison -->
+    <div class="col-lg-6">
+        <div class="card-custom h-100 p-3">
+            <h6 class="fw-bold text-white mb-1">
+                <i class="fa-solid fa-gauge-high text-success me-2"></i>Operation Throughput (Operations/Sec)
+            </h6>
+            <p class="text-secondary small mb-3">Sustained single-core throughput across parameter sets</p>
+            <div style="height: 280px;">
+                <canvas id="chartThroughputComp"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart 4: Classical vs Post-Quantum (Experiment J) -->
+    <div class="col-lg-6">
+        <div class="card-custom h-100 p-3">
+            <h6 class="fw-bold text-white mb-1">
+                <i class="fa-solid fa-scale-balanced text-primary me-2"></i>Classical ECDH vs Post-Quantum ML-KEM
+            </h6>
+            <p class="text-secondary small mb-3">Communication overhead: Curve25519 vs NIST P-256 vs ML-KEM-768</p>
+            <div style="height: 280px;">
+                <canvas id="chartClassicalComp"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Detailed Comparison Table -->
+<div class="row g-4">
+    <div class="col-12">
+        <div class="card-custom">
+            <div class="card-header">
+                <i class="fa-solid fa-table-list text-info me-2"></i>Comprehensive Parameter Specification & Benchmark Matrix
+            </div>
+            <div class="table-responsive">
+                <table class="table table-custom">
+                    <thead>
+                        <tr>
+                            <th>Parameter Set</th>
+                            <th>NIST Cat.</th>
+                            <th>Security Equiv.</th>
+                            <th>Public Key</th>
+                            <th>Private Key</th>
+                            <th>Ciphertext</th>
+                            <th>Shared Secret</th>
+                            <th>KeyGen (µs)</th>
+                            <th>Encaps (µs)</th>
+                            <th>Decaps (µs)</th>
+                            <th>Roundtrip (µs)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="compTableBody">
+                        <!-- Populated dynamically via JS -->
+                        <tr><td colspan="11" class="text-center py-4 text-secondary">Loading comparative sweep data...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/comparison.js') }}"></script>
+{% endblock %}

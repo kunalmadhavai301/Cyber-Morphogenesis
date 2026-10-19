@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block title %}Cryptographic Demonstration | ML-KEM (FIPS 203){% endblock %}
+
+{% block content %}
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="d-flex flex-wrap justify-content-between align-items-center pb-3 border-bottom border-secondary border-opacity-25">
+            <div>
+                <h2 class="h3 fw-bold mb-1 text-white">Interactive ML-KEM Key Encapsulation</h2>
+                <p class="text-secondary mb-0">
+                    Step-by-step cryptographic demonstration between simulated Alice (Recipient) and Bob (Sender)
+                </p>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <span class="badge bg-dark border border-secondary text-secondary py-2 px-3">
+                    <i class="fa-solid fa-shield text-info me-1"></i> Constant-Time Secret Verification
+                </span>
+                <button id="btnClearSession" class="btn btn-outline-custom btn-sm" onclick="cryptoDemo.resetDemo()">
+                    <i class="fa-solid fa-rotate-left me-1"></i> Reset Workflow
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Workflow Stepper Indicator -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3 col-sm-6">
+        <div id="stepCard1" class="workflow-step active">
+            <span class="step-num">1</span>
+            <h6 class="fw-bold text-white mb-1">Key Generation</h6>
+            <p class="text-secondary small mb-0">Alice generates $(ek, dk)$</p>
+            <div id="stepStatus1" class="mt-2 text-info small"><i class="fa-solid fa-arrow-right me-1"></i> Ready</div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+        <div id="stepCard2" class="workflow-step">
+            <span class="step-num">2</span>
+            <h6 class="fw-bold text-white mb-1">Encapsulation</h6>
+            <p class="text-secondary small mb-0">Bob encapsulates $(c, K)$</p>
+            <div id="stepStatus2" class="mt-2 text-muted small">Pending Step 1</div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+        <div id="stepCard3" class="workflow-step">
+            <span class="step-num">3</span>
+            <h6 class="fw-bold text-white mb-1">Decapsulation</h6>
+            <p class="text-secondary small mb-0">Alice computes $K' = \text{Decap}(dk, c)$</p>
+            <div id="stepStatus3" class="mt-2 text-muted small">Pending Step 2</div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+        <div id="stepCard4" class="workflow-step">
+            <span class="step-num">4</span>
+            <h6 class="fw-bold text-white mb-1">Verification</h6>
+            <p class="text-secondary small mb-0">Constant-time match ($K == K'$)</p>
+            <div id="stepStatus4" class="mt-2 text-muted small">Pending Step 3</div>
+        </div>
+    </div>
+</div>
+
+<!-- Interactive Workspace -->
+<div class="row g-4">
+    <!-- Left Configuration & Action Controls -->
+    <div class="col-lg-5">
+        <div class="card-custom mb-4">
+            <div class="card-header">
+                <i class="fa-solid fa-sliders text-info me-2"></i>Workflow Controls
+            </div>
+            <div class="card-body p-3">
+                <div class="mb-3">
+                    <label class="form-label text-secondary small fw-semibold">Target Parameter Set</label>
+                    <select id="selectParamSet" class="form-select form-select-dark">
+                        <option value="ML-KEM-512">ML-KEM-512 (Category 1, AES-128 equiv)</option>
+                        <option value="ML-KEM-768" selected>ML-KEM-768 (Category 3, AES-192 equiv - Default)</option>
+                        <option value="ML-KEM-1024">ML-KEM-1024 (Category 5, AES-256 equiv)</option>
+                    </select>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button id="btnKeygen" class="btn btn-primary-custom" onclick="cryptoDemo.generateKeyPair()">
+                        <i class="fa-solid fa-key me-1"></i> 1. Generate Key Pair (Alice)
+                    </button>
+                    <button id="btnEncaps" class="btn btn-outline-custom" onclick="cryptoDemo.encapsulate()" disabled>
+                        <i class="fa-solid fa-lock me-1"></i> 2. Encapsulate Secret (Bob)
+                    </button>
+                    <button id="btnDecaps" class="btn btn-outline-custom" onclick="cryptoDemo.decapsulate()" disabled>
+                        <i class="fa-solid fa-unlock me-1"></i> 3. Decapsulate Ciphertext (Alice)
+                    </button>
+                    <button id="btnVerify" class="btn btn-outline-custom" onclick="cryptoDemo.verifySecrets()" disabled>
+                        <i class="fa-solid fa-check-double me-1"></i> 4. Verify Secret Agreement
+                    </button>
+                </div>
+
+                <hr class="border-secondary border-opacity-25 my-3">
+
+                <!-- Negative Testing (Implicit Rejection) -->
+                <div>
+                    <label class="form-label text-warning small fw-semibold d-flex justify-content-between">
+                        <span><i class="fa-solid fa-triangle-exclamation me-1"></i> Negative Test: Implicit Rejection</span>
+                    </label>
+                    <p class="text-secondary small mb-2" style="font-size: 0.8rem;">
+                        Tamper with the ciphertext bits before decapsulation. Under FIPS 203 §5.3, ML-KEM implicitly rejects corrupted ciphertexts by deriving a pseudorandom key rather than throwing an exception.
+                    </p>
+                    <button id="btnCorruptCT" class="btn btn-outline-warning btn-sm w-100" onclick="cryptoDemo.simulateCorruptedCiphertext()" disabled>
+                        <i class="fa-solid fa-bug me-1"></i> Tamper Ciphertext & Decapsulate
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Security Guarantee Card -->
+        <div class="card-custom p-3 border-info border-opacity-25">
+            <h6 class="fw-bold text-info mb-2">
+                <i class="fa-solid fa-shield-virus me-2"></i>Security Safeguards
+            </h6>
+            <ul class="text-secondary small mb-0 ps-3">
+                <li class="mb-1">Private key bytes are never exported across REST boundaries.</li>
+                <li class="mb-1">Shared secrets are compared in server memory via constant-time verification.</li>
+                <li>Session tokens automatically expire ephemeral keys after 15 minutes.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Right Live Telemetry & Artifact Inspector -->
+    <div class="col-lg-7">
+        <div class="card-custom h-100">
+            <div class="card-header">
+                <i class="fa-solid fa-terminal text-info me-2"></i>Cryptographic Inspection Log
+                <span id="sessionBadge" class="badge bg-secondary-subtle border border-secondary text-secondary font-monospace" style="font-size: 0.72rem;">
+                    No Active Session
+                </span>
+            </div>
+            <div class="card-body p-3">
+                <div id="demoLogContainer" class="p-3 rounded bg-dark border border-secondary border-opacity-25 font-monospace small" style="min-height: 440px; max-height: 550px; overflow-y: auto;">
+                    <div class="text-secondary">// Ready to begin. Click "Generate Key Pair" to initialize ephemeral session.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/crypto-demo.js') }}"></script>
+{% endblock %}

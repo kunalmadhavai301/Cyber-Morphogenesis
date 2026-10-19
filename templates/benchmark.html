@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+
+{% block title %}Benchmark Lab | ML-KEM (FIPS 203){% endblock %}
+
+{% block content %}
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="d-flex flex-wrap justify-content-between align-items-center pb-3 border-bottom border-secondary border-opacity-25">
+            <div>
+                <h2 class="h3 fw-bold mb-1 text-white">Cryptographic Benchmarking Lab</h2>
+                <p class="text-secondary mb-0">
+                    High-resolution, reproducible performance evaluation of ML-KEM under controlled workloads
+                </p>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="/api/benchmark/export/csv" class="btn btn-outline-custom">
+                    <i class="fa-solid fa-file-csv me-1 text-info"></i> Export All Data (CSV)
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Configuration Form -->
+    <div class="col-lg-4">
+        <div class="card-custom mb-4">
+            <div class="card-header">
+                <i class="fa-solid fa-sliders text-info me-2"></i>Benchmark Configuration
+            </div>
+            <div class="card-body p-3">
+                <form id="benchmarkForm" onsubmit="event.preventDefault(); benchmarkLab.runBenchmark();">
+                    <div class="mb-3">
+                        <label class="form-label text-secondary small fw-semibold">Parameter Set</label>
+                        <select id="benchParam" class="form-select form-select-dark">
+                            <option value="ML-KEM-512">ML-KEM-512 (Category 1)</option>
+                            <option value="ML-KEM-768" selected>ML-KEM-768 (Category 3 - Recommended)</option>
+                            <option value="ML-KEM-1024">ML-KEM-1024 (Category 5)</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-secondary small fw-semibold">Cryptographic Operation</label>
+                        <select id="benchOp" class="form-select form-select-dark">
+                            <option value="all" selected>All (KeyGen + Encaps + Decaps)</option>
+                            <option value="keygen">Key Generation Only</option>
+                            <option value="encaps">Encapsulation Only</option>
+                            <option value="decaps">Decapsulation Only</option>
+                        </select>
+                    </div>
+
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label class="form-label text-secondary small fw-semibold">Trials Count</label>
+                            <input type="number" id="benchTrials" class="form-control form-control-dark" value="100" min="5" max="5000">
+                            <div class="form-text text-muted" style="font-size: 0.72rem;">Min: 5, Max: 5000</div>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label text-secondary small fw-semibold">Warmup Iterations</label>
+                            <input type="number" id="benchWarmup" class="form-control form-control-dark" value="20" min="0" max="200">
+                            <div class="form-text text-muted" style="font-size: 0.72rem;">JIT/Cache stabilization</div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-secondary small fw-semibold">Experimental Notes / Tag</label>
+                        <input type="text" id="benchNotes" class="form-control form-control-dark" placeholder="e.g. Standard baseline run">
+                    </div>
+
+                    <button type="submit" id="btnStartBench" class="btn btn-primary-custom w-100 py-2">
+                        <i class="fa-solid fa-play me-1"></i> Start Benchmark Execution
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- System Clock & Architecture Card -->
+        <div class="card-custom p-3">
+            <h6 class="fw-bold text-white mb-2">
+                <i class="fa-solid fa-microchip text-info me-2"></i>Timing & System Architecture
+            </h6>
+            <div class="small text-secondary">
+                <div class="d-flex justify-content-between py-1 border-bottom border-secondary border-opacity-25">
+                    <span>Monotonic Clock:</span>
+                    <span class="font-monospace text-info">perf_counter_ns</span>
+                </div>
+                <div class="d-flex justify-content-between py-1 border-bottom border-secondary border-opacity-25">
+                    <span>Clock Resolution:</span>
+                    <span class="font-monospace text-success">100.00 ns</span>
+                </div>
+                <div class="d-flex justify-content-between py-1 border-bottom border-secondary border-opacity-25">
+                    <span>Cryptographic Engine:</span>
+                    <span class="text-white">mlkem (FIPS 203)</span>
+                </div>
+                <div class="d-flex justify-content-between py-1">
+                    <span>Process RSS Profiling:</span>
+                    <span class="text-white">psutil + tracemalloc</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Results Panel -->
+    <div class="col-lg-8">
+        <!-- Progress Bar & Spinner (Hidden by default) -->
+        <div id="benchProgressContainer" class="card-custom p-4 mb-4 text-center d-none">
+            <div class="spinner-border text-info mb-3" role="status"></div>
+            <h5 class="fw-bold text-white mb-1">Executing Cryptographic Workload...</h5>
+            <p class="text-secondary small mb-3">Performing warm-up calibration, nanosecond timing trials, and statistical processing.</p>
+            <div class="progress bg-dark border border-secondary border-opacity-25" style="height: 8px;">
+                <div id="benchProgressBar" class="progress-bar progress-bar-striped progress-bar-animated bg-info" style="width: 100%;"></div>
+            </div>
+        </div>
+
+        <!-- Results Card -->
+        <div id="benchResultsCard" class="card-custom">
+            <div class="card-header">
+                <span><i class="fa-solid fa-chart-column text-info me-2"></i>Benchmark Execution Results</span>
+                <span id="resExperimentId" class="badge bg-secondary-subtle border border-secondary text-info font-monospace small">
+                    Awaiting Execution
+                </span>
+            </div>
+            <div class="card-body p-3">
+                <div id="emptyResultPlaceholder" class="p-5 text-center text-secondary">
+                    <i class="fa-solid fa-stopwatch fa-3x mb-3 text-secondary opacity-50"></i>
+                    <h5 class="text-white fw-bold mb-2">No Active Benchmark Results</h5>
+                    <p class="small mb-0">Select your parameters on the left and click <strong>"Start Benchmark Execution"</strong> to record real measurements.</p>
+                </div>
+
+                <div id="resultsContent" class="d-none">
+                    <!-- Top KPI Summary Cards -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-sm-4">
+                            <div class="metric-card">
+                                <div class="metric-label">Total Execution Time</div>
+                                <div id="resTotalDuration" class="metric-value fs-3">—</div>
+                                <div class="metric-sub">Elapsed runtime</div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="metric-card green">
+                                <div class="metric-label">Roundtrip Median</div>
+                                <div id="resRoundtripMedian" class="metric-value fs-3">—</div>
+                                <div class="metric-sub">KeyGen + Encap + Decap</div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="metric-card amber">
+                                <div class="metric-label">KeyGen Throughput</div>
+                                <div id="resThroughput" class="metric-value fs-3">—</div>
+                                <div class="metric-sub">Operations / second</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chart Container -->
+                    <div class="mb-4 p-3 rounded bg-dark border border-secondary border-opacity-25">
+                        <h6 class="fw-bold text-white mb-3">Latency Distribution (Microseconds)</h6>
+                        <div style="height: 250px;">
+                            <canvas id="benchChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Statistical Analysis Table -->
+                    <h6 class="fw-bold text-white mb-2">Descriptive & Inferential Statistical Summary</h6>
+                    <div class="table-responsive">
+                        <table class="table table-custom">
+                            <thead>
+                                <tr>
+                                    <th>Operation</th>
+                                    <th>Trials</th>
+                                    <th>Mean (µs)</th>
+                                    <th>Median (µs)</th>
+                                    <th>P95 (µs)</th>
+                                    <th>Std Dev (µs)</th>
+                                    <th>Min / Max (µs)</th>
+                                    <th>95% CI (µs)</th>
+                                    <th>Throughput (ops/s)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="statsTableBody">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/benchmark.js') }}"></script>
+{% endblock %}
