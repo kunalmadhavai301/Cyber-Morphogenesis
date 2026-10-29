@@ -2,14 +2,19 @@
 Ephemeral Key Management Module for Demonstration and Benchmarking Sessions.
 Ensures session isolation, zero disk persistence of secret keys, TTL expiration,
 and strict prevention of private key and shared secret leakage.
+Also provides post-quantum hybrid message encryption & decryption using AES-256-GCM
+keyed directly by the ML-KEM shared secret.
 """
 
 import time
 import secrets
+import os
 import threading
 from dataclasses import dataclass, field
 from typing import Dict, Optional, Any, Tuple
 import hmac
+from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+from cryptography.exceptions import InvalidTag
 
 from .mlkem_service import KeyPairResult, EncapsulationResult, DecapsulationResult
 
@@ -34,6 +39,11 @@ class KeyReference:
     _recipient_shared_secret: Optional[bytes] = field(default=None, repr=False)
     verified_match: Optional[bool] = None
 
+    # Hybrid AES-256-GCM Message Tracking
+    last_msg_nonce: Optional[bytes] = field(default=None, repr=False)
+    last_msg_ciphertext: Optional[bytes] = field(default=None, repr=False)
+    last_msg_plaintext: Optional[str] = field(default=None, repr=False)
+
     def is_expired(self) -> bool:
         return time.time() > self.expires_at
 
@@ -43,6 +53,9 @@ class KeyReference:
         self._sender_shared_secret = None
         self._recipient_shared_secret = None
         self.ciphertext_bytes = None
+        self.last_msg_nonce = None
+        self.last_msg_ciphertext = None
+        self.last_msg_plaintext = None
 
 
 class SessionKeyManager:
@@ -142,6 +155,108 @@ class SessionKeyManager:
             msg = "Shared secrets match successfully (32 bytes confirmed)." if is_match else "Shared secret mismatch!"
             return is_match, msg
 
+    # =========================================================================
+    # Post-Quantum Message Encryption & Decryption (AES-256-GCM)
+    # =========================================================================
+
+    def encrypt_user_message(self, session_id: str, key_id: str, plaintext: str) -> Dict[str, Any]:
+        """Encrypts an arbitrary user message using AES-256-GCM with the ML-KEM shared secret.
+        
+        Args:
+            session_id: Active session.
+            key_id: Target keypair reference.
+            plaintext: Text to encrypt.
+            
+        Returns:
+            Dict containing nonce_hex, ciphertext_hex, latency_us, and payload sizes.
+        """
+        with self._lock:
+            ref = self.get_key_reference(session_id, key_id)
+            if ref._sender_shared_secret is None:
+                raise ValueError("Cannot encrypt: ML-KEM shared secret has not been encapsulated yet.")
+
+            t0 = time.perf_counter_ns()
+            # Shared secret is exactly 32 bytes (256 bits), perfect for AES-256-GCM
+            aesgcm = AESGCM(ref._sender_shared_secret)
+            nonce = os.urandom(12)  # Standard 96-bit NIST GCM nonce
+            ct_bytes = aesgcm.encrypt(nonce, plaintext.encode("utf-8"), None)
+            t_elapsed_us = (time.perf_counter_ns() - t0) / 1000.0
+
+            ref.last_msg_nonce = nonce
+            ref.last_msg_ciphertext = ct_bytes
+            ref.last_msg_plaintext = plaintext
+
+            return {
+                "status": "success",
+                "algorithm": f"AES-256-GCM (Keyed by {ref.parameter_set} 32-Byte Secret)",
+                "plaintext_bytes": len(plaintext.encode("utf-8")),
+                "nonce_hex": nonce.hex(),
+                "ciphertext_hex": ct_bytes.hex(),
+                "ciphertext_bytes": len(ct_bytes),
+                "auth_tag_bytes": 16,
+                "encryption_latency_us": round(t_elapsed_us, 2),
+            }
+
+    def decrypt_user_message(
+        self,
+        session_id: str,
+        key_id: str,
+        custom_ciphertext_hex: Optional[str] = None,
+        custom_nonce_hex: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """Decrypts the ciphertext using Alice's recovered ML-KEM secret.
+        
+        If the ciphertext has been modified or the key doesn't match,
+        AES-GCM authentication tag verification will raise InvalidTag and fail safely.
+        """
+        with self._lock:
+            ref = self.get_key_reference(session_id, key_id)
+            if ref._recipient_shared_secret is None:
+                raise ValueError("Cannot decrypt: Recipient has not decapsulated the ML-KEM secret yet.")
+
+            # Resolve nonce and ciphertext
+            if custom_nonce_hex:
+                try:
+                    nonce = bytes.fromhex(custom_nonce_hex)
+                except ValueError:
+                    raise ValueError("Malformed nonce hex string.")
+            elif ref.last_msg_nonce:
+                nonce = ref.last_msg_nonce
+            else:
+                raise ValueError("No encrypted message available to decrypt. Encrypt a message first.")
+
+            if custom_ciphertext_hex:
+                try:
+                    ct_bytes = bytes.fromhex(custom_ciphertext_hex)
+                except ValueError:
+                    raise ValueError("Malformed ciphertext hex string.")
+            elif ref.last_msg_ciphertext:
+                ct_bytes = ref.last_msg_ciphertext
+            else:
+                raise ValueError("No ciphertext available to decrypt.")
+
+            t0 = time.perf_counter_ns()
+            aesgcm = AESGCM(ref._recipient_shared_secret)
+            try:
+                decrypted_bytes = aesgcm.decrypt(nonce, ct_bytes, None)
+                t_elapsed_us = (time.perf_counter_ns() - t0) / 1000.0
+                plaintext = decrypted_bytes.decode("utf-8", errors="replace")
+
+                return {
+                    "status": "success",
+                    "authenticated": True,
+                    "plaintext": plaintext,
+                    "decryption_latency_us": round(t_elapsed_us, 2),
+                    "message": "Message authenticated and decrypted successfully with ML-KEM recovered key!"
+                }
+            except InvalidTag:
+                return {
+                    "status": "authentication_failed",
+                    "authenticated": False,
+                    "plaintext": None,
+                    "error": "AUTHENTICATION FAILURE: AES-GCM Tag mismatch! The message has been tampered with or decrypted with an invalid key."
+                }
+
     def get_public_metadata(self, session_id: str, key_id: str) -> Dict[str, Any]:
         """Returns safe public metadata for dashboard display.
         
@@ -159,6 +274,8 @@ class SessionKeyManager:
                 "has_sender_secret": ref._sender_shared_secret is not None,
                 "has_recipient_secret": ref._recipient_shared_secret is not None,
                 "verified_match": ref.verified_match,
+                "has_encrypted_msg": ref.last_msg_ciphertext is not None,
+                "last_msg_nonce_hex": ref.last_msg_nonce.hex() if ref.last_msg_nonce else None,
                 "created_at": ref.created_at,
                 "expires_at": ref.expires_at,
                 "public_key_hex_preview": ref.public_key_bytes[:16].hex() + "...",

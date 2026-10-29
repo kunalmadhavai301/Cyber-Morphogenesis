@@ -21,6 +21,8 @@ from .schemas import (
     EncapsulateRequest,
     DecapsulateRequest,
     VerifyRequest,
+    EncryptMessageRequest,
+    DecryptMessageRequest,
     BenchmarkRunRequest,
 )
 
@@ -236,6 +238,53 @@ def kem_verify():
         return jsonify({"error": str(e)}), 404
     except Exception as e:
         return jsonify({"error": f"Verification error: {e}"}), 500
+
+
+@api_bp.route("/kem/encrypt-message", methods=["POST"])
+def kem_encrypt_message():
+    """Encrypts an arbitrary user message using AES-256-GCM keyed by the ML-KEM shared secret."""
+    try:
+        data = request.get_json() or {}
+        req = EncryptMessageRequest(**data)
+    except ValidationError as e:
+        details = [f"{'.'.join(str(loc) for loc in err['loc'])}: {err['msg']}" for err in e.errors()]
+        return jsonify({"error": "Validation failed", "details": details}), 400
+
+    try:
+        result = key_manager.encrypt_user_message(req.session_id, req.key_id, req.plaintext)
+        return jsonify(result)
+    except KeyError as e:
+        return jsonify({"error": str(e)}), 404
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
+    except Exception as e:
+        return jsonify({"error": f"Message encryption error: {e}"}), 500
+
+
+@api_bp.route("/kem/decrypt-message", methods=["POST"])
+def kem_decrypt_message():
+    """Decrypts ciphertext using the recipient's ML-KEM decapsulated secret via AES-256-GCM."""
+    try:
+        data = request.get_json() or {}
+        req = DecryptMessageRequest(**data)
+    except ValidationError as e:
+        details = [f"{'.'.join(str(loc) for loc in err['loc'])}: {err['msg']}" for err in e.errors()]
+        return jsonify({"error": "Validation failed", "details": details}), 400
+
+    try:
+        result = key_manager.decrypt_user_message(
+            req.session_id,
+            req.key_id,
+            custom_ciphertext_hex=req.custom_ciphertext_hex,
+            custom_nonce_hex=req.custom_nonce_hex
+        )
+        return jsonify(result)
+    except KeyError as e:
+        return jsonify({"error": str(e)}), 404
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
+    except Exception as e:
+        return jsonify({"error": f"Message decryption error: {e}"}), 500
 
 
 # =============================================================================

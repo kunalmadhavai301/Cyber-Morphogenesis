@@ -42,6 +42,19 @@ class VerifyRequest(BaseModel):
     key_id: str = Field(..., min_length=8, max_length=64)
 
 
+class EncryptMessageRequest(BaseModel):
+    session_id: str = Field(..., min_length=16, max_length=64)
+    key_id: str = Field(..., min_length=8, max_length=64)
+    plaintext: str = Field(..., min_length=1, max_length=10000, description="Plaintext message to encrypt")
+
+
+class DecryptMessageRequest(BaseModel):
+    session_id: str = Field(..., min_length=16, max_length=64)
+    key_id: str = Field(..., min_length=8, max_length=64)
+    custom_ciphertext_hex: Optional[str] = Field(default=None, description="Optional tampered or custom ciphertext")
+    custom_nonce_hex: Optional[str] = Field(default=None, description="Optional custom nonce")
+
+
 class BenchmarkRunRequest(BaseModel):
     parameter_set: str = Field(default="ML-KEM-768")
     operation: Literal["keygen", "encaps", "decaps", "all"] = Field(default="all")

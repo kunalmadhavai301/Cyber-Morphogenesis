@@ -88,6 +88,42 @@ class TestApiEndpoints:
         assert ver_data["verified_match"] is True
         assert ver_data["constant_time_verification"] is True
 
+        # 6. Test User Message Encryption & Decryption (AES-256-GCM via ML-KEM Key)
+        secret_msg = "Top-Secret Quantum Defense Plan 2026"
+        res_enc_msg = client.post("/api/kem/encrypt-message", json={
+            "session_id": session_id,
+            "key_id": key_id,
+            "plaintext": secret_msg
+        })
+        assert res_enc_msg.status_code == 200
+        enc_msg_data = res_enc_msg.get_json()
+        assert enc_msg_data["status"] == "success"
+        assert "ciphertext_hex" in enc_msg_data
+        assert "nonce_hex" in enc_msg_data
+
+        # 7. Decrypt with Alice's recovered ML-KEM key
+        res_dec_msg = client.post("/api/kem/decrypt-message", json={
+            "session_id": session_id,
+            "key_id": key_id
+        })
+        assert res_dec_msg.status_code == 200
+        dec_msg_data = res_dec_msg.get_json()
+        assert dec_msg_data["status"] == "success"
+        assert dec_msg_data["authenticated"] is True
+        assert dec_msg_data["plaintext"] == secret_msg
+
+        # 8. Test Tampered Message Decryption (AES-GCM Auth Failure)
+        tampered_hex = enc_msg_data["ciphertext_hex"][:-4] + "ffff"
+        res_tampered = client.post("/api/kem/decrypt-message", json={
+            "session_id": session_id,
+            "key_id": key_id,
+            "custom_ciphertext_hex": tampered_hex
+        })
+        assert res_tampered.status_code == 200
+        tamper_data = res_tampered.get_json()
+        assert tamper_data["status"] == "authentication_failed"
+        assert tamper_data["authenticated"] is False
+
     def test_benchmark_run_and_results(self, client):
         res = client.post("/api/benchmark/run", json={
             "parameter_set": "ML-KEM-512",

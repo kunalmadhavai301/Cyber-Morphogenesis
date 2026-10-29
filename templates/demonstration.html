@@ -1,60 +1,64 @@
 {% extends "base.html" %}
 
-{% block title %}Cryptographic Demonstration | ML-KEM (FIPS 203){% endblock %}
+{% block title %}Cryptographic Demonstration & Encrypted Messaging | ML-KEM (FIPS 203){% endblock %}
 
 {% block content %}
+<!-- Page Header -->
 <div class="row g-4 mb-4">
     <div class="col-12">
         <div class="d-flex flex-wrap justify-content-between align-items-center pb-3 border-bottom border-secondary border-opacity-25">
             <div>
                 <span class="badge bg-primary-subtle border border-primary text-primary mb-2 px-3 py-1 fw-bold">
-                    <i class="fa-solid fa-play me-1"></i> Interactive Simulation
+                    <i class="fa-solid fa-play me-1"></i> Interactive Simulation & End-to-End Encryption
                 </span>
-                <h1 class="h3 fw-bold mb-1 text-white">Interactive ML-KEM Key Encapsulation</h1>
+                <h1 class="h3 fw-bold mb-1 text-white">Interactive ML-KEM Key Encapsulation & Messaging Studio</h1>
                 <p class="text-secondary mb-0">
-                    A simple step-by-step walkthrough showing how Alice (Recipient) and Bob (Sender) establish a quantum-safe shared secret.
+                    Type any secret message into the text box below to encrypt and decrypt it using quantum-safe ML-KEM and AES-256-GCM.
                 </p>
             </div>
-            <div class="d-flex align-items-center gap-2">
+            <div class="d-flex align-items-center gap-2 mt-3 mt-md-0">
+                <button id="btnSoundToggle" class="btn btn-outline-custom btn-sm" onclick="cryptoDemo.toggleSound()">
+                    <i id="soundIcon" class="fa-solid fa-volume-high text-info me-1"></i> <span id="soundText">Sound: ON</span>
+                </button>
                 <button id="btnClearSession" class="btn btn-outline-custom btn-sm" onclick="cryptoDemo.resetDemo()">
-                    <i class="fa-solid fa-rotate-left me-1"></i> Reset Workflow
+                    <i class="fa-solid fa-rotate-left me-1"></i> Reset All
                 </button>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Friendly "How This Demo Works" Guide Banner -->
+<!-- Friendly "How This Works" 4-Step Guide Banner -->
 <div class="row g-3 mb-4">
     <div class="col-12">
         <div class="card-custom p-3 border-primary border-opacity-25" style="background: rgba(37, 99, 235, 0.05);">
             <div class="d-flex align-items-center gap-2 mb-2">
                 <i class="fa-solid fa-lightbulb text-warning fs-5"></i>
-                <h6 class="fw-bold text-white mb-0">How This Demonstration Works (in 30 seconds)</h6>
+                <h6 class="fw-bold text-white mb-0">How to Encrypt and Decrypt Your Message (Quick Guide)</h6>
             </div>
             <div class="row g-2 text-secondary small">
                 <div class="col-md-3">
                     <div class="p-2 rounded bg-dark border border-secondary border-opacity-25 h-100">
-                        <strong class="text-info d-block mb-1">1. Alice Generates Keys</strong>
-                        Alice creates a <strong>Public Key</strong> (which she can share with the world) and keeps a <strong>Private Key</strong> safe in memory.
+                        <strong class="text-info d-block mb-1">1. Type in the Text Box</strong>
+                        Type any confidential message or password into the <strong>Bob's Message Composer</strong> text box below.
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="p-2 rounded bg-dark border border-secondary border-opacity-25 h-100">
-                        <strong class="text-warning d-block mb-1">2. Bob Encapsulates</strong>
-                        Bob uses Alice's public key to create a 32-byte secret code, locks it into a <strong>Ciphertext</strong>, and sends it to Alice.
+                        <strong class="text-warning d-block mb-1">2. Click "Encrypt Message"</strong>
+                        The platform establishes a 32-byte quantum-safe ML-KEM key and encrypts your text using <strong>AES-256-GCM</strong>.
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="p-2 rounded bg-dark border border-secondary border-opacity-25 h-100">
-                        <strong class="text-primary d-block mb-1">3. Alice Decapsulates</strong>
-                        Alice uses her private key to unlock the ciphertext and retrieve the exact same 32-byte secret code.
+                        <strong class="text-primary d-block mb-1">3. Watch Packet Flight</strong>
+                        Watch the animated optical channel transmit the encrypted ciphertext safely across the insecure network wire.
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="p-2 rounded bg-dark border border-secondary border-opacity-25 h-100">
-                        <strong class="text-success d-block mb-1">4. Constant-Time Match</strong>
-                        Both check if their secrets match. If an attacker tampers with the ciphertext, ML-KEM silently gives a fake key!
+                        <strong class="text-success d-block mb-1">4. Click "Decrypt Message"</strong>
+                        Alice recovers the exact plaintext using her ML-KEM private key, proving quantum-safe end-to-end security!
                     </div>
                 </div>
             </div>
@@ -62,57 +66,301 @@
     </div>
 </div>
 
-<!-- Workflow Stepper Indicator -->
-<div class="row g-3 mb-4">
-    <div class="col-md-3 col-sm-6">
-        <div id="stepCard1" class="workflow-step active">
-            <span class="step-num">1</span>
-            <h6 class="fw-bold text-white mb-1">Step 1: Alice KeyGen</h6>
-            <p class="text-secondary small mb-0">Generates public/private keys</p>
-            <div id="stepStatus1" class="mt-2 text-info small"><i class="fa-solid fa-arrow-right me-1"></i> Ready &bull; Click Button 1</div>
-        </div>
-    </div>
-    <div class="col-md-3 col-sm-6">
-        <div id="stepCard2" class="workflow-step">
-            <span class="step-num">2</span>
-            <h6 class="fw-bold text-white mb-1">Step 2: Bob Encaps</h6>
-            <p class="text-secondary small mb-0">Bob creates ciphertext & secret</p>
-            <div id="stepStatus2" class="mt-2 text-muted small">Pending Step 1</div>
-        </div>
-    </div>
-    <div class="col-md-3 col-sm-6">
-        <div id="stepCard3" class="workflow-step">
-            <span class="step-num">3</span>
-            <h6 class="fw-bold text-white mb-1">Step 3: Alice Decaps</h6>
-            <p class="text-secondary small mb-0">Alice recovers secret from ciphertext</p>
-            <div id="stepStatus3" class="mt-2 text-muted small">Pending Step 2</div>
-        </div>
-    </div>
-    <div class="col-md-3 col-sm-6">
-        <div id="stepCard4" class="workflow-step">
-            <span class="step-num">4</span>
-            <h6 class="fw-bold text-white mb-1">Step 4: Verify Match</h6>
-            <p class="text-secondary small mb-0">Constant-time secret equality check</p>
-            <div id="stepStatus4" class="mt-2 text-muted small">Pending Step 3</div>
+<!-- Visual Transmission Wire Stage (Animated Channel) -->
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="transmission-stage">
+            <div class="row align-items-center">
+                <!-- Alice Node (Recipient) -->
+                <div class="col-lg-3 col-md-4 text-center">
+                    <div id="aliceNodeBox" class="node-box node-alice">
+                        <div id="aliceAvatar" class="node-avatar alice-avatar">
+                            <i class="fa-solid fa-user-shield"></i>
+                        </div>
+                        <h6 class="fw-bold text-white mb-1">Alice <span class="badge bg-info-subtle border border-info text-info small">Recipient</span></h6>
+                        <div class="small text-secondary mb-2" style="font-size: 0.78rem;">Holds Decapsulation Key (dk)</div>
+                        <div class="d-flex flex-column gap-1">
+                            <span id="aliceEkBadge" class="badge bg-dark border border-secondary text-secondary small py-1">
+                                <span class="status-dot dot-cyan me-1"></span> Public Key: Not Created
+                            </span>
+                            <span id="aliceDkBadge" class="badge bg-dark border border-secondary text-secondary small py-1">
+                                <span class="status-dot dot-cyan me-1"></span> Private Key: Inactive
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Middle Insecure Transmission Channel & Flying Packets -->
+                <div class="col-lg-6 col-md-4 my-3 my-md-0">
+                    <div class="channel-container">
+                        <!-- Packet Flight Track -->
+                        <div class="packet-track position-relative w-100">
+                            <!-- Public Key Packet (Alice -> Bob) -->
+                            <div id="packetPublicKey" class="packet-pill packet-cyan">
+                                <i class="fa-solid fa-key"></i> <span id="packetEkText">Public Key (ek)</span>
+                            </div>
+                            <!-- Ciphertext Packet (Bob -> Alice) -->
+                            <div id="packetCiphertext" class="packet-pill packet-amber">
+                                <i class="fa-solid fa-box-archive"></i> <span id="packetCtText">Ciphertext (ct)</span>
+                            </div>
+                            <!-- Encrypted Message Packet (Bob -> Alice) -->
+                            <div id="packetMessage" class="packet-pill packet-green">
+                                <i class="fa-solid fa-lock"></i> <span>AES-256-GCM Payload</span>
+                            </div>
+                        </div>
+
+                        <!-- Physical Channel Wire -->
+                        <div class="channel-wire"></div>
+
+                        <!-- Channel Status Pill -->
+                        <div id="channelStatusPill" class="channel-badge mt-3">
+                            <i id="channelIcon" class="fa-solid fa-wifi text-info"></i>
+                            <span id="channelStatusText">Insecure Public Transmission Medium &bull; Ready</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bob Node (Sender) -->
+                <div class="col-lg-3 col-md-4 text-center">
+                    <div id="bobNodeBox" class="node-box node-bob">
+                        <div id="bobAvatar" class="node-avatar bob-avatar">
+                            <i class="fa-solid fa-user-lock"></i>
+                        </div>
+                        <h6 class="fw-bold text-white mb-1">Bob <span class="badge bg-warning-subtle border border-warning text-warning small">Sender</span></h6>
+                        <div class="small text-secondary mb-2" style="font-size: 0.78rem;">Generates Shared Secret (K)</div>
+                        <div class="d-flex flex-column gap-1">
+                            <span id="bobSecretBadge" class="badge bg-dark border border-secondary text-secondary small py-1">
+                                <span class="status-dot dot-amber me-1"></span> Secret (K): Not Established
+                            </span>
+                            <span id="bobCtBadge" class="badge bg-dark border border-secondary text-secondary small py-1">
+                                <span class="status-dot dot-amber me-1"></span> Ciphertext: Not Built
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
-<!-- Interactive Workspace -->
-<div class="row g-4">
+<!-- ======================================================================= -->
+<!-- Post-Quantum End-to-End Encrypted Messaging Studio (Primary Feature) -->
+<!-- ======================================================================= -->
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div id="messagingStudioCard" class="studio-container studio-unlocked p-4">
+            <div class="d-flex flex-wrap justify-content-between align-items-center pb-3 border-bottom border-secondary border-opacity-25 mb-4">
+                <div>
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                        <i class="fa-solid fa-shield-halved text-success fs-4"></i>
+                        <h4 class="fw-bold text-white mb-0">Post-Quantum Text Encryption & Decryption Studio</h4>
+                    </div>
+                    <p class="text-secondary small mb-0">
+                        Write any secret message into the text box below. It will be encrypted with <strong>AES-256-GCM</strong>, keyed directly by the 32-byte <strong>ML-KEM</strong> post-quantum shared secret.
+                    </p>
+                </div>
+                <div class="mt-2 mt-md-0 d-flex align-items-center gap-2">
+                    <span id="studioKeyStatusBadge" class="badge bg-success-subtle border border-success text-success px-3 py-2">
+                        <i class="fa-solid fa-bolt me-1"></i> Ready &bull; Auto-Key Exchange Enabled
+                    </span>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <!-- Column 1: Bob (Sender) Message Composer -->
+                <div class="col-lg-4">
+                    <div class="card-custom h-100 p-3 border-warning border-opacity-25 bg-black d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <h6 class="fw-bold text-warning mb-0">
+                                    <i class="fa-solid fa-pen-to-square me-1"></i> 1. Write Message to Encrypt
+                                </h6>
+                                <span id="msgByteCountBadge" class="badge bg-dark border border-secondary text-secondary" style="font-size: 0.72rem;">
+                                    0 bytes
+                                </span>
+                            </div>
+
+                            <!-- User Plaintext Input Text Box -->
+                            <div class="mb-2">
+                                <label for="userPlaintextInput" class="text-secondary small fw-semibold mb-1" style="font-size: 0.74rem;">
+                                    Type any confidential message below:
+                                </label>
+                                <textarea id="userPlaintextInput" class="form-control form-control-dark font-monospace" rows="4" placeholder="Type your secret message here (e.g. passwords, coordinates, confidential data)..." oninput="cryptoDemo.updateByteCount()">🛰️ TOP SECRET: Sector Alpha-9 coordinates 37.7749° N, 122.4194° W. Auth Token: PQC-SEC-2026.</textarea>
+                            </div>
+
+                            <!-- Preset Sample Text Pills -->
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <span class="text-secondary small" style="font-size: 0.72rem;">Quick Preset Examples:</span>
+                                    <button type="button" class="btn btn-sm btn-link text-secondary p-0 text-decoration-none" style="font-size: 0.72rem;" onclick="cryptoDemo.clearPlaintextBox()">
+                                        <i class="fa-solid fa-eraser me-1"></i> Clear Box
+                                    </button>
+                                </div>
+                                <div class="d-flex flex-wrap gap-1">
+                                    <button type="button" class="sample-preset-btn" onclick="cryptoDemo.setSampleMessage('coordinates')">
+                                        🛰️ Defense Coordinates
+                                    </button>
+                                    <button type="button" class="sample-preset-btn" onclick="cryptoDemo.setSampleMessage('bank')">
+                                        🏦 SWIFT Wire
+                                    </button>
+                                    <button type="button" class="sample-preset-btn" onclick="cryptoDemo.setSampleMessage('credentials')">
+                                        🔐 Master Token
+                                    </button>
+                                    <button type="button" class="sample-preset-btn" onclick="cryptoDemo.setSampleMessage('rover')">
+                                        🚀 Mars Telemetry
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <!-- Encrypt and Send Button -->
+                            <button id="btnEncryptMessage" class="btn btn-success py-2 w-100 fw-bold shadow-sm" onclick="cryptoDemo.encryptMessage()">
+                                <i class="fa-solid fa-lock me-1"></i> 🔒 Encrypt Message (ML-KEM + AES-256-GCM)
+                            </button>
+
+                            <div id="encryptResultMeta" class="mt-2 small text-secondary d-flex justify-content-between align-items-center" style="font-size: 0.75rem; display: none;">
+                                <span class="text-success"><i class="fa-solid fa-check me-1"></i> Encrypted in <strong id="encryptLatencyText">0.0 µs</strong></span>
+                                <span id="encryptAlgBadge" class="badge bg-dark border border-secondary text-info">AES-256-GCM</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Column 2: In-Transit Transmission & Ciphertext Box -->
+                <div class="col-lg-4">
+                    <div class="card-custom h-100 p-3 border-secondary border-opacity-25 bg-black d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <h6 class="fw-bold text-white mb-0">
+                                    <i class="fa-solid fa-network-wired text-info me-1"></i> 2. In-Transit Ciphertext
+                                </h6>
+                                <span id="transitStatusBadge" class="badge bg-secondary text-dark" style="font-size: 0.72rem;">Ready</span>
+                            </div>
+
+                            <p class="text-secondary small mb-2" style="font-size: 0.74rem;">
+                                Payload transmitted over the wire (AES-256-GCM Ciphertext + 12-Byte Nonce + 16-Byte Tag):
+                            </p>
+
+                            <!-- Nonce Display Box -->
+                            <div class="mb-2">
+                                <label class="text-secondary small fw-semibold" style="font-size: 0.72rem;">Initialization Vector (Nonce, 12 bytes):</label>
+                                <input type="text" id="displayNonceHex" class="form-control form-control-dark font-monospace cipher-hex-box" placeholder="12-byte Nonce hex..." value="">
+                            </div>
+
+                            <!-- Editable Ciphertext Box -->
+                            <div class="mb-2">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <label class="text-secondary small fw-semibold mb-0" style="font-size: 0.72rem;">
+                                        Encrypted Ciphertext (Hex):
+                                    </label>
+                                    <div class="d-flex gap-1 align-items-center">
+                                        <span id="tamperIndicator" class="text-danger fw-bold" style="font-size: 0.72rem; display: none;">[TAMPERED]</span>
+                                        <button type="button" class="btn-copy" onclick="cryptoDemo.copyCiphertext()" title="Copy Ciphertext Hex">
+                                            <i class="fa-regular fa-copy me-1"></i> Copy
+                                        </button>
+                                    </div>
+                                </div>
+                                <textarea id="displayCiphertextHex" class="form-control form-control-dark font-monospace cipher-hex-box" rows="3" placeholder="Encrypted ciphertext hex will appear here..."></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Tamper / MITM Attack Controls -->
+                        <div class="pt-2 border-top border-secondary border-opacity-25">
+                            <label class="text-warning small fw-bold d-block mb-1" style="font-size: 0.74rem;">
+                                <i class="fa-solid fa-triangle-exclamation me-1"></i> Man-in-the-Middle (MITM) Tamper Attack:
+                            </label>
+                            <div class="d-flex gap-2">
+                                <button id="btnTamperMessage" class="btn btn-outline-danger btn-sm flex-grow-1" onclick="cryptoDemo.tamperCiphertext()" disabled>
+                                    <i class="fa-solid fa-skull-crossbones me-1"></i> Corrupt 1 Byte (Tamper)
+                                </button>
+                                <button id="btnRestoreMessage" class="btn btn-outline-secondary btn-sm" onclick="cryptoDemo.restoreOriginalCiphertext()" disabled title="Restore authentic ciphertext">
+                                    <i class="fa-solid fa-rotate-left"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Column 3: Alice (Recipient) Decryptor & Plaintext Output -->
+                <div class="col-lg-4">
+                    <div class="card-custom h-100 p-3 border-primary border-opacity-25 bg-black d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <h6 class="fw-bold text-info mb-0">
+                                    <i class="fa-solid fa-inbox me-1"></i> 3. Alice Receives & Decrypts
+                                </h6>
+                                <span id="inboxStatusBadge" class="badge bg-secondary-subtle border border-secondary text-secondary" style="font-size: 0.72rem;">
+                                    Ready
+                                </span>
+                            </div>
+
+                            <!-- Decrypt Button -->
+                            <button id="btnDecryptMessage" class="btn btn-primary-custom py-2 w-100 mb-3 fw-bold" onclick="cryptoDemo.decryptMessage()">
+                                <i id="decryptButtonIcon" class="fa-solid fa-unlock me-1"></i> 🔓 Decrypt Message with Alice's Key
+                            </button>
+
+                            <!-- Decryption Result Display Box -->
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <label class="text-secondary small fw-semibold mb-0" style="font-size: 0.72rem;">Decrypted Plaintext Output:</label>
+                                <button type="button" class="btn-copy" onclick="cryptoDemo.copyPlaintext()" title="Copy Decrypted Text">
+                                    <i class="fa-regular fa-copy me-1"></i> Copy
+                                </button>
+                            </div>
+
+                            <div id="decryptResultContainer" class="p-3 rounded bg-dark border border-secondary border-opacity-25 mb-2" style="min-height: 105px;">
+                                <div id="decryptPlaceholderText" class="text-muted small italic">
+                                    Click <strong>"Encrypt Message"</strong> on the left, then click <strong>"Decrypt Message"</strong> to read the decrypted text here.
+                                </div>
+                                <div id="decryptSuccessContent" style="display: none;">
+                                    <div class="d-flex align-items-center gap-2 text-success fw-bold small mb-1">
+                                        <i class="fa-solid fa-circle-check fs-6"></i>
+                                        <span>AUTHENTICATED DECRYPTION SUCCESS</span>
+                                    </div>
+                                    <div id="decryptedPlaintextText" class="p-2 rounded bg-black border border-success border-opacity-50 text-white font-monospace small" style="word-break: break-all;"></div>
+                                </div>
+                                <div id="decryptFailureContent" style="display: none;">
+                                    <div class="d-flex align-items-center gap-2 text-danger fw-bold small mb-1">
+                                        <i class="fa-solid fa-triangle-exclamation fs-6"></i>
+                                        <span>AUTHENTICATION TAG FAILURE</span>
+                                    </div>
+                                    <div id="decryptedErrorText" class="p-2 rounded bg-black border border-danger border-opacity-50 text-danger font-monospace small" style="font-size: 0.75rem;"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Microsecond Benchmark Telemetry -->
+                        <div id="decryptMetaContainer" class="small text-secondary pt-2 border-top border-secondary border-opacity-25 d-flex justify-content-between align-items-center" style="font-size: 0.75rem;">
+                            <span>AEAD Status: <strong id="aeadStatusText" class="text-muted">Awaiting Action</strong></span>
+                            <span id="decryptLatencyText" class="badge bg-dark border border-secondary text-muted">0.0 µs</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ======================================================================= -->
+<!-- Step-by-Step Protocol Walkthrough & Live Activity Terminal -->
+<!-- ======================================================================= -->
+<div class="row g-4 mb-4">
     <!-- Left Configuration & Action Controls -->
     <div class="col-lg-5">
         <div class="card-custom mb-4">
-            <div class="card-header">
-                <i class="fa-solid fa-hand-pointer text-info me-2"></i>Interactive Action Buttons
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="fa-solid fa-hand-pointer text-info me-2"></i>Step-by-Step Protocol Controls</span>
+                <button id="btnAutoRun" class="btn btn-outline-info btn-sm" onclick="cryptoDemo.autoRunKeyExchange()">
+                    <i class="fa-solid fa-bolt me-1"></i> 1-Click Auto Run
+                </button>
             </div>
             <div class="card-body p-3">
                 <div class="mb-3">
                     <label class="form-label text-secondary small fw-semibold">Choose Parameter Set</label>
-                    <select id="selectParamSet" class="form-select form-select-dark">
-                        <option value="ML-KEM-512">ML-KEM-512 (Fastest & Smallest - Cat 1)</option>
-                        <option value="ML-KEM-768" selected>ML-KEM-768 (Recommended Standard - Cat 3)</option>
-                        <option value="ML-KEM-1024">ML-KEM-1024 (Highest Security - Cat 5)</option>
+                    <select id="selectParamSet" class="form-select form-select-dark" onchange="cryptoDemo.changeParameterSet(this.value)">
+                        <option value="ML-KEM-512">ML-KEM-512 (Fastest & Smallest - NIST Cat 1)</option>
+                        <option value="ML-KEM-768" selected>ML-KEM-768 (Recommended Standard - NIST Cat 3)</option>
+                        <option value="ML-KEM-1024">ML-KEM-1024 (Highest Security - NIST Cat 5)</option>
                     </select>
                 </div>
 
@@ -136,10 +384,10 @@
                 <!-- Negative Testing (Implicit Rejection) -->
                 <div class="p-3 rounded bg-black border border-warning border-opacity-25">
                     <label class="form-label text-warning small fw-bold d-flex justify-content-between mb-1">
-                        <span><i class="fa-solid fa-bug me-1"></i> Test Tampered Ciphertext (Implicit Rejection)</span>
+                        <span><i class="fa-solid fa-bug me-1"></i> Test Tampered ML-KEM Ciphertext</span>
                     </label>
                     <p class="text-secondary small mb-2" style="font-size: 0.78rem;">
-                        What happens if a hacker corrupts the ciphertext? Under FIPS 203 §5.3, ML-KEM doesn't crash or throw an error. It quietly derives a fake random key so attackers can't learn anything!
+                        Under FIPS 203 §5.3, if an attacker tampers with the ciphertext, ML-KEM silently derives a fake random key rather than throwing an error, defeating chosen-ciphertext attacks!
                     </p>
                     <button id="btnCorruptCT" class="btn btn-outline-warning btn-sm w-100" onclick="cryptoDemo.simulateCorruptedCiphertext()" disabled>
                         <i class="fa-solid fa-triangle-exclamation me-1"></i> Tamper Ciphertext & Decapsulate
@@ -151,12 +399,12 @@
         <!-- Security Guarantee Card -->
         <div class="card-custom p-3 border-info border-opacity-25">
             <h6 class="fw-bold text-info mb-2">
-                <i class="fa-solid fa-shield-virus me-2"></i>Security Guarantee
+                <i class="fa-solid fa-shield-virus me-2"></i>Security Guarantees
             </h6>
             <ul class="text-secondary small mb-0 ps-3">
-                <li class="mb-1">Private keys and shared secrets are never sent over HTTP JSON or printed in logs.</li>
-                <li class="mb-1">Secrets are compared inside server RAM using constant-time algorithms.</li>
-                <li>Temporary demonstration keys automatically expire in 15 minutes.</li>
+                <li class="mb-1">Private keys and shared secrets are never exposed in JSON responses or log outputs.</li>
+                <li class="mb-1">Secrets are compared strictly in server RAM using constant-time comparison (<code>hmac.compare_digest</code>).</li>
+                <li>Temporary keys expire automatically in 15 minutes to guarantee session isolation.</li>
             </ul>
         </div>
     </div>
@@ -164,15 +412,22 @@
     <!-- Right Live Telemetry & Artifact Inspector -->
     <div class="col-lg-7">
         <div class="card-custom h-100">
-            <div class="card-header">
-                <i class="fa-solid fa-terminal text-info me-2"></i>Live Cryptographic Activity Log
-                <span id="sessionBadge" class="badge bg-secondary-subtle border border-secondary text-secondary font-monospace" style="font-size: 0.72rem;">
-                    No Active Session
-                </span>
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                    <i class="fa-solid fa-terminal text-info me-2"></i>Live Cryptographic Activity Log
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <span id="sessionBadge" class="badge bg-secondary-subtle border border-secondary text-secondary font-monospace" style="font-size: 0.72rem;">
+                        No Active Session
+                    </span>
+                    <button class="btn btn-sm btn-link text-secondary text-decoration-none p-0" onclick="cryptoDemo.clearLog()" title="Clear terminal">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                </div>
             </div>
             <div class="card-body p-3">
-                <div id="demoLogContainer" class="p-3 rounded bg-dark border border-secondary border-opacity-25 font-monospace small" style="min-height: 440px; max-height: 550px; overflow-y: auto;">
-                    <div class="text-secondary">// Ready to begin! Click button "1. Alice: Generate Key Pair" to start.</div>
+                <div id="demoLogContainer" class="p-3 rounded bg-dark border border-secondary border-opacity-25 font-monospace small" style="min-height: 480px; max-height: 540px; overflow-y: auto;">
+                    <div class="text-secondary">// Ready to begin! Type any message in the text box above and click "Encrypt Message".</div>
                 </div>
             </div>
         </div>

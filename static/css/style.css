@@ -301,3 +301,387 @@ footer {
     color: var(--text-muted);
     font-size: 0.85rem;
 }
+
+/* ==========================================================================
+   Interactive Animation & Visual Transmission Wire Styles
+   ========================================================================== */
+
+/* Visual Transmission Wire Stage */
+.transmission-stage {
+    position: relative;
+    background: radial-gradient(circle at 50% 50%, #0d1527 0%, #080c14 100%);
+    border: 1px solid rgba(56, 189, 248, 0.25);
+    border-radius: 12px;
+    padding: 1.5rem;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.transmission-stage::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 24px,
+        rgba(56, 189, 248, 0.02) 24px,
+        rgba(56, 189, 248, 0.02) 25px
+    );
+    pointer-events: none;
+}
+
+.node-box {
+    background: rgba(17, 24, 39, 0.9);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 1rem;
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 2;
+}
+
+.node-box.node-alice {
+    border-color: rgba(56, 189, 248, 0.4);
+}
+
+.node-box.node-bob {
+    border-color: rgba(251, 191, 36, 0.4);
+}
+
+.node-box.active-pulse-cyan {
+    box-shadow: 0 0 25px rgba(56, 189, 248, 0.4);
+    border-color: var(--accent-blue);
+    transform: translateY(-2px);
+}
+
+.node-box.active-pulse-amber {
+    box-shadow: 0 0 25px rgba(251, 191, 36, 0.4);
+    border-color: var(--accent-amber);
+    transform: translateY(-2px);
+}
+
+.node-box.active-pulse-green {
+    box-shadow: 0 0 25px rgba(52, 211, 153, 0.4);
+    border-color: var(--accent-green);
+    transform: translateY(-2px);
+}
+
+.node-avatar {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    margin: 0 auto 0.75rem auto;
+    position: relative;
+}
+
+.node-avatar.alice-avatar {
+    background: rgba(56, 189, 248, 0.15);
+    color: var(--accent-blue);
+    border: 2px solid var(--accent-blue);
+}
+
+.node-avatar.bob-avatar {
+    background: rgba(251, 191, 36, 0.15);
+    color: var(--accent-amber);
+    border: 2px solid var(--accent-amber);
+}
+
+/* Transmission Cable / Channel */
+.channel-container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0 1rem;
+    min-height: 120px;
+}
+
+.channel-wire {
+    position: relative;
+    width: 100%;
+    height: 6px;
+    background: linear-gradient(90deg, #38bdf8 0%, #818cf8 50%, #fbbf24 100%);
+    border-radius: 3px;
+    box-shadow: 0 0 12px rgba(56, 189, 248, 0.5);
+    overflow: visible;
+}
+
+.channel-wire::after {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: 0;
+    right: 0;
+    bottom: -2px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
+    animation: wireScan 3s linear infinite;
+    border-radius: 4px;
+}
+
+@keyframes wireScan {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+.channel-badge {
+    margin-top: 0.85rem;
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 0.25rem 0.85rem;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+/* Flying Data Packet */
+.packet-track {
+    position: absolute;
+    top: -18px;
+    left: 5%;
+    width: 90%;
+    height: 40px;
+    pointer-events: none;
+    z-index: 5;
+}
+
+.packet-pill {
+    position: absolute;
+    top: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.35rem 0.8rem;
+    border-radius: 30px;
+    font-size: 0.76rem;
+    font-weight: 700;
+    font-family: ui-monospace, monospace;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    box-shadow: 0 0 15px currentColor;
+    white-space: nowrap;
+}
+
+.packet-pill.packet-cyan {
+    background: #0284c7;
+    color: #ffffff;
+    border: 1px solid #38bdf8;
+}
+
+.packet-pill.packet-amber {
+    background: #d97706;
+    color: #ffffff;
+    border: 1px solid #fbbf24;
+}
+
+.packet-pill.packet-green {
+    background: #059669;
+    color: #ffffff;
+    border: 1px solid #34d399;
+}
+
+/* Keyframes for traveling packets */
+@keyframes packetTravelEast {
+    0% {
+        left: 0%;
+        opacity: 0;
+        transform: scale(0.6);
+    }
+    15% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    85% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    100% {
+        left: 88%;
+        opacity: 0;
+        transform: scale(0.6);
+    }
+}
+
+@keyframes packetTravelWest {
+    0% {
+        left: 88%;
+        opacity: 0;
+        transform: scale(0.6);
+    }
+    15% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    85% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    100% {
+        left: 0%;
+        opacity: 0;
+        transform: scale(0.6);
+    }
+}
+
+.animate-east {
+    animation: packetTravelEast 2.2s cubic-bezier(0.25, 1, 0.5, 1) forwards !important;
+}
+
+.animate-west {
+    animation: packetTravelWest 2.2s cubic-bezier(0.25, 1, 0.5, 1) forwards !important;
+}
+
+/* Lock Unlock Pulse Animation */
+@keyframes unlockShockwave {
+    0% {
+        transform: scale(0.9);
+        box-shadow: 0 0 0 rgba(52, 211, 153, 0);
+    }
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 0 30px rgba(52, 211, 153, 0.6);
+    }
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 10px rgba(52, 211, 153, 0.2);
+    }
+}
+
+.animate-unlock {
+    animation: unlockShockwave 0.8s ease-out;
+}
+
+/* Shake Animation for Tamper Rejection */
+@keyframes shakeReject {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-8px); }
+    40%, 80% { transform: translateX(8px); }
+}
+
+.animate-tamper-shake {
+    animation: shakeReject 0.5s ease-in-out;
+}
+
+/* Glowing Pulsing Status Lights */
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.status-dot.dot-cyan {
+    background-color: var(--accent-blue);
+    box-shadow: 0 0 8px var(--accent-blue);
+}
+
+.status-dot.dot-amber {
+    background-color: var(--accent-amber);
+    box-shadow: 0 0 8px var(--accent-amber);
+}
+
+.status-dot.dot-green {
+    background-color: var(--accent-green);
+    box-shadow: 0 0 8px var(--accent-green);
+}
+
+.status-dot.dot-red {
+    background-color: var(--accent-rose);
+    box-shadow: 0 0 8px var(--accent-rose);
+}
+
+/* Encrypted Studio Card */
+.studio-container {
+    background: linear-gradient(180deg, rgba(17, 24, 39, 0.95) 0%, rgba(11, 15, 25, 0.98) 100%);
+    border: 1px solid rgba(52, 211, 153, 0.3);
+    border-radius: 12px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.studio-container.studio-locked {
+    border-color: rgba(255, 255, 255, 0.1);
+    opacity: 0.85;
+}
+
+.studio-container.studio-unlocked {
+    border-color: rgba(52, 211, 153, 0.6);
+    box-shadow: 0 0 30px rgba(52, 211, 153, 0.15);
+}
+
+.cipher-hex-box {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.78rem;
+    background: #060910;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 6px;
+    padding: 0.65rem;
+    color: #a7f3d0;
+    word-break: break-all;
+    max-height: 90px;
+    overflow-y: auto;
+}
+
+textarea.cipher-hex-box, input.cipher-hex-box {
+    width: 100%;
+    resize: vertical;
+    outline: none;
+    line-height: 1.4;
+}
+
+textarea.cipher-hex-box:focus, input.cipher-hex-box:focus {
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.25);
+    background: #060910;
+    color: #a7f3d0;
+}
+
+.btn-copy {
+    font-size: 0.72rem;
+    padding: 0.2rem 0.55rem;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: var(--text-secondary);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.btn-copy:hover {
+    background: rgba(56, 189, 248, 0.2);
+    border-color: var(--accent-blue);
+    color: #fff;
+}
+
+
+.cipher-hex-box.tampered {
+    color: #fca5a5;
+    border-color: rgba(244, 63, 94, 0.4);
+    background: rgba(244, 63, 94, 0.05);
+}
+
+.sample-preset-btn {
+    font-size: 0.74rem;
+    padding: 0.2rem 0.55rem;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-secondary);
+    transition: all 0.15s ease;
+}
+
+.sample-preset-btn:hover {
+    background: rgba(56, 189, 248, 0.15);
+    border-color: var(--accent-blue);
+    color: #fff;
+}
+
