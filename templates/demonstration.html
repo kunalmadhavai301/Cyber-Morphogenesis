@@ -7,18 +7,56 @@
     <div class="col-12">
         <div class="d-flex flex-wrap justify-content-between align-items-center pb-3 border-bottom border-secondary border-opacity-25">
             <div>
-                <h2 class="h3 fw-bold mb-1 text-white">Interactive ML-KEM Key Encapsulation</h2>
+                <span class="badge bg-primary-subtle border border-primary text-primary mb-2 px-3 py-1 fw-bold">
+                    <i class="fa-solid fa-play me-1"></i> Interactive Simulation
+                </span>
+                <h1 class="h3 fw-bold mb-1 text-white">Interactive ML-KEM Key Encapsulation</h1>
                 <p class="text-secondary mb-0">
-                    Step-by-step cryptographic demonstration between simulated Alice (Recipient) and Bob (Sender)
+                    A simple step-by-step walkthrough showing how Alice (Recipient) and Bob (Sender) establish a quantum-safe shared secret.
                 </p>
             </div>
-            <div class="d-flex align-items-center gap-3">
-                <span class="badge bg-dark border border-secondary text-secondary py-2 px-3">
-                    <i class="fa-solid fa-shield text-info me-1"></i> Constant-Time Secret Verification
-                </span>
+            <div class="d-flex align-items-center gap-2">
                 <button id="btnClearSession" class="btn btn-outline-custom btn-sm" onclick="cryptoDemo.resetDemo()">
                     <i class="fa-solid fa-rotate-left me-1"></i> Reset Workflow
                 </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Friendly "How This Demo Works" Guide Banner -->
+<div class="row g-3 mb-4">
+    <div class="col-12">
+        <div class="card-custom p-3 border-primary border-opacity-25" style="background: rgba(37, 99, 235, 0.05);">
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <i class="fa-solid fa-lightbulb text-warning fs-5"></i>
+                <h6 class="fw-bold text-white mb-0">How This Demonstration Works (in 30 seconds)</h6>
+            </div>
+            <div class="row g-2 text-secondary small">
+                <div class="col-md-3">
+                    <div class="p-2 rounded bg-dark border border-secondary border-opacity-25 h-100">
+                        <strong class="text-info d-block mb-1">1. Alice Generates Keys</strong>
+                        Alice creates a <strong>Public Key</strong> (which she can share with the world) and keeps a <strong>Private Key</strong> safe in memory.
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="p-2 rounded bg-dark border border-secondary border-opacity-25 h-100">
+                        <strong class="text-warning d-block mb-1">2. Bob Encapsulates</strong>
+                        Bob uses Alice's public key to create a 32-byte secret code, locks it into a <strong>Ciphertext</strong>, and sends it to Alice.
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="p-2 rounded bg-dark border border-secondary border-opacity-25 h-100">
+                        <strong class="text-primary d-block mb-1">3. Alice Decapsulates</strong>
+                        Alice uses her private key to unlock the ciphertext and retrieve the exact same 32-byte secret code.
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="p-2 rounded bg-dark border border-secondary border-opacity-25 h-100">
+                        <strong class="text-success d-block mb-1">4. Constant-Time Match</strong>
+                        Both check if their secrets match. If an attacker tampers with the ciphertext, ML-KEM silently gives a fake key!
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -29,32 +67,32 @@
     <div class="col-md-3 col-sm-6">
         <div id="stepCard1" class="workflow-step active">
             <span class="step-num">1</span>
-            <h6 class="fw-bold text-white mb-1">Key Generation</h6>
-            <p class="text-secondary small mb-0">Alice generates $(ek, dk)$</p>
-            <div id="stepStatus1" class="mt-2 text-info small"><i class="fa-solid fa-arrow-right me-1"></i> Ready</div>
+            <h6 class="fw-bold text-white mb-1">Step 1: Alice KeyGen</h6>
+            <p class="text-secondary small mb-0">Generates public/private keys</p>
+            <div id="stepStatus1" class="mt-2 text-info small"><i class="fa-solid fa-arrow-right me-1"></i> Ready &bull; Click Button 1</div>
         </div>
     </div>
     <div class="col-md-3 col-sm-6">
         <div id="stepCard2" class="workflow-step">
             <span class="step-num">2</span>
-            <h6 class="fw-bold text-white mb-1">Encapsulation</h6>
-            <p class="text-secondary small mb-0">Bob encapsulates $(c, K)$</p>
+            <h6 class="fw-bold text-white mb-1">Step 2: Bob Encaps</h6>
+            <p class="text-secondary small mb-0">Bob creates ciphertext & secret</p>
             <div id="stepStatus2" class="mt-2 text-muted small">Pending Step 1</div>
         </div>
     </div>
     <div class="col-md-3 col-sm-6">
         <div id="stepCard3" class="workflow-step">
             <span class="step-num">3</span>
-            <h6 class="fw-bold text-white mb-1">Decapsulation</h6>
-            <p class="text-secondary small mb-0">Alice computes $K' = \text{Decap}(dk, c)$</p>
+            <h6 class="fw-bold text-white mb-1">Step 3: Alice Decaps</h6>
+            <p class="text-secondary small mb-0">Alice recovers secret from ciphertext</p>
             <div id="stepStatus3" class="mt-2 text-muted small">Pending Step 2</div>
         </div>
     </div>
     <div class="col-md-3 col-sm-6">
         <div id="stepCard4" class="workflow-step">
             <span class="step-num">4</span>
-            <h6 class="fw-bold text-white mb-1">Verification</h6>
-            <p class="text-secondary small mb-0">Constant-time match ($K == K'$)</p>
+            <h6 class="fw-bold text-white mb-1">Step 4: Verify Match</h6>
+            <p class="text-secondary small mb-0">Constant-time secret equality check</p>
             <div id="stepStatus4" class="mt-2 text-muted small">Pending Step 3</div>
         </div>
     </div>
@@ -66,45 +104,45 @@
     <div class="col-lg-5">
         <div class="card-custom mb-4">
             <div class="card-header">
-                <i class="fa-solid fa-sliders text-info me-2"></i>Workflow Controls
+                <i class="fa-solid fa-hand-pointer text-info me-2"></i>Interactive Action Buttons
             </div>
             <div class="card-body p-3">
                 <div class="mb-3">
-                    <label class="form-label text-secondary small fw-semibold">Target Parameter Set</label>
+                    <label class="form-label text-secondary small fw-semibold">Choose Parameter Set</label>
                     <select id="selectParamSet" class="form-select form-select-dark">
-                        <option value="ML-KEM-512">ML-KEM-512 (Category 1, AES-128 equiv)</option>
-                        <option value="ML-KEM-768" selected>ML-KEM-768 (Category 3, AES-192 equiv - Default)</option>
-                        <option value="ML-KEM-1024">ML-KEM-1024 (Category 5, AES-256 equiv)</option>
+                        <option value="ML-KEM-512">ML-KEM-512 (Fastest & Smallest - Cat 1)</option>
+                        <option value="ML-KEM-768" selected>ML-KEM-768 (Recommended Standard - Cat 3)</option>
+                        <option value="ML-KEM-1024">ML-KEM-1024 (Highest Security - Cat 5)</option>
                     </select>
                 </div>
 
                 <div class="d-grid gap-2">
-                    <button id="btnKeygen" class="btn btn-primary-custom" onclick="cryptoDemo.generateKeyPair()">
-                        <i class="fa-solid fa-key me-1"></i> 1. Generate Key Pair (Alice)
+                    <button id="btnKeygen" class="btn btn-primary-custom py-2" onclick="cryptoDemo.generateKeyPair()">
+                        <i class="fa-solid fa-key me-2"></i> 1. Alice: Generate Key Pair
                     </button>
-                    <button id="btnEncaps" class="btn btn-outline-custom" onclick="cryptoDemo.encapsulate()" disabled>
-                        <i class="fa-solid fa-lock me-1"></i> 2. Encapsulate Secret (Bob)
+                    <button id="btnEncaps" class="btn btn-outline-custom py-2" onclick="cryptoDemo.encapsulate()" disabled>
+                        <i class="fa-solid fa-lock me-2"></i> 2. Bob: Encapsulate Secret
                     </button>
-                    <button id="btnDecaps" class="btn btn-outline-custom" onclick="cryptoDemo.decapsulate()" disabled>
-                        <i class="fa-solid fa-unlock me-1"></i> 3. Decapsulate Ciphertext (Alice)
+                    <button id="btnDecaps" class="btn btn-outline-custom py-2" onclick="cryptoDemo.decapsulate()" disabled>
+                        <i class="fa-solid fa-unlock me-2"></i> 3. Alice: Decapsulate Ciphertext
                     </button>
-                    <button id="btnVerify" class="btn btn-outline-custom" onclick="cryptoDemo.verifySecrets()" disabled>
-                        <i class="fa-solid fa-check-double me-1"></i> 4. Verify Secret Agreement
+                    <button id="btnVerify" class="btn btn-outline-custom py-2" onclick="cryptoDemo.verifySecrets()" disabled>
+                        <i class="fa-solid fa-check-double me-2"></i> 4. Verify Secrets Match
                     </button>
                 </div>
 
                 <hr class="border-secondary border-opacity-25 my-3">
 
                 <!-- Negative Testing (Implicit Rejection) -->
-                <div>
-                    <label class="form-label text-warning small fw-semibold d-flex justify-content-between">
-                        <span><i class="fa-solid fa-triangle-exclamation me-1"></i> Negative Test: Implicit Rejection</span>
+                <div class="p-3 rounded bg-black border border-warning border-opacity-25">
+                    <label class="form-label text-warning small fw-bold d-flex justify-content-between mb-1">
+                        <span><i class="fa-solid fa-bug me-1"></i> Test Tampered Ciphertext (Implicit Rejection)</span>
                     </label>
-                    <p class="text-secondary small mb-2" style="font-size: 0.8rem;">
-                        Tamper with the ciphertext bits before decapsulation. Under FIPS 203 §5.3, ML-KEM implicitly rejects corrupted ciphertexts by deriving a pseudorandom key rather than throwing an exception.
+                    <p class="text-secondary small mb-2" style="font-size: 0.78rem;">
+                        What happens if a hacker corrupts the ciphertext? Under FIPS 203 §5.3, ML-KEM doesn't crash or throw an error. It quietly derives a fake random key so attackers can't learn anything!
                     </p>
                     <button id="btnCorruptCT" class="btn btn-outline-warning btn-sm w-100" onclick="cryptoDemo.simulateCorruptedCiphertext()" disabled>
-                        <i class="fa-solid fa-bug me-1"></i> Tamper Ciphertext & Decapsulate
+                        <i class="fa-solid fa-triangle-exclamation me-1"></i> Tamper Ciphertext & Decapsulate
                     </button>
                 </div>
             </div>
@@ -113,12 +151,12 @@
         <!-- Security Guarantee Card -->
         <div class="card-custom p-3 border-info border-opacity-25">
             <h6 class="fw-bold text-info mb-2">
-                <i class="fa-solid fa-shield-virus me-2"></i>Security Safeguards
+                <i class="fa-solid fa-shield-virus me-2"></i>Security Guarantee
             </h6>
             <ul class="text-secondary small mb-0 ps-3">
-                <li class="mb-1">Private key bytes are never exported across REST boundaries.</li>
-                <li class="mb-1">Shared secrets are compared in server memory via constant-time verification.</li>
-                <li>Session tokens automatically expire ephemeral keys after 15 minutes.</li>
+                <li class="mb-1">Private keys and shared secrets are never sent over HTTP JSON or printed in logs.</li>
+                <li class="mb-1">Secrets are compared inside server RAM using constant-time algorithms.</li>
+                <li>Temporary demonstration keys automatically expire in 15 minutes.</li>
             </ul>
         </div>
     </div>
@@ -127,14 +165,14 @@
     <div class="col-lg-7">
         <div class="card-custom h-100">
             <div class="card-header">
-                <i class="fa-solid fa-terminal text-info me-2"></i>Cryptographic Inspection Log
+                <i class="fa-solid fa-terminal text-info me-2"></i>Live Cryptographic Activity Log
                 <span id="sessionBadge" class="badge bg-secondary-subtle border border-secondary text-secondary font-monospace" style="font-size: 0.72rem;">
                     No Active Session
                 </span>
             </div>
             <div class="card-body p-3">
                 <div id="demoLogContainer" class="p-3 rounded bg-dark border border-secondary border-opacity-25 font-monospace small" style="min-height: 440px; max-height: 550px; overflow-y: auto;">
-                    <div class="text-secondary">// Ready to begin. Click "Generate Key Pair" to initialize ephemeral session.</div>
+                    <div class="text-secondary">// Ready to begin! Click button "1. Alice: Generate Key Pair" to start.</div>
                 </div>
             </div>
         </div>

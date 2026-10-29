@@ -63,6 +63,9 @@
                     </li>
                 </ul>
                 <div class="d-flex align-items-center gap-2">
+                    <button class="btn btn-sm btn-info text-dark fw-bold px-3" data-bs-toggle="modal" data-bs-target="#howToUseModal">
+                        <i class="fa-solid fa-circle-question me-1"></i> How to Use
+                    </button>
                     <a href="/api/benchmark/export/csv" class="btn btn-outline-custom btn-sm">
                         <i class="fa-solid fa-download me-1"></i> Export CSV
                     </a>
@@ -73,6 +76,86 @@
             </div>
         </div>
     </nav>
+
+    <!-- Global "How to Use" Modal -->
+    <div class="modal fade" id="howToUseModal" tabindex="-1" aria-labelledby="howToUseModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content bg-dark border border-secondary">
+                <div class="modal-header border-secondary border-opacity-25 pb-3">
+                    <h5 class="modal-title text-white fw-bold" id="howToUseModalLabel">
+                        <i class="fa-solid fa-compass text-info me-2"></i>How to Use This Platform (Quick Guide)
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <p class="text-secondary small mb-4">
+                        Welcome to the <strong>ML-KEM Benchmarking Platform</strong>! This website is designed to be very simple and intuitive. Follow these 4 straightforward steps to explore quantum-safe encryption:
+                    </p>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="p-3 rounded bg-black border border-secondary border-opacity-25 h-100">
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <span class="badge bg-primary text-white rounded-pill px-2 py-1">Step 1</span>
+                                    <h6 class="text-white fw-bold mb-0">Try the Interactive Demo</h6>
+                                </div>
+                                <p class="text-secondary small mb-3">
+                                    Go to <strong>Demonstration</strong> to see simulated key exchange between Alice (recipient) and Bob (sender). Click each button in sequence (1 &rarr; 2 &rarr; 3 &rarr; 4) to exchange and verify a shared secret.
+                                </p>
+                                <a href="{{ url_for('demonstration') }}" class="btn btn-outline-info btn-sm w-100" data-bs-dismiss="modal">
+                                    <i class="fa-solid fa-play me-1"></i> Open Demonstration
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-3 rounded bg-black border border-secondary border-opacity-25 h-100">
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <span class="badge bg-success text-dark rounded-pill px-2 py-1">Step 2</span>
+                                    <h6 class="text-white fw-bold mb-0">Run a Live Benchmark</h6>
+                                </div>
+                                <p class="text-secondary small mb-3">
+                                    Go to <strong>Benchmark Lab</strong> to test the speed of ML-KEM on your computer. Select ML-KEM-768, pick 100 trials, and click <strong>"Start Benchmark"</strong>. Microsecond charts will appear in seconds!
+                                </p>
+                                <a href="{{ url_for('benchmark') }}" class="btn btn-outline-success btn-sm w-100" data-bs-dismiss="modal">
+                                    <i class="fa-solid fa-stopwatch me-1"></i> Open Benchmark Lab
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-3 rounded bg-black border border-secondary border-opacity-25 h-100">
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <span class="badge bg-warning text-dark rounded-pill px-2 py-1">Step 3</span>
+                                    <h6 class="text-white fw-bold mb-0">Compare All Parameters</h6>
+                                </div>
+                                <p class="text-secondary small mb-3">
+                                    Go to <strong>Comparison</strong> to visualize the trade-offs between ML-KEM-512, 768, and 1024, plus see how post-quantum lattice crypto compares to classical Elliptic Curve (ECDH).
+                                </p>
+                                <a href="{{ url_for('comparison') }}" class="btn btn-outline-warning btn-sm w-100" data-bs-dismiss="modal">
+                                    <i class="fa-solid fa-code-compare me-1"></i> Open Comparison
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-3 rounded bg-black border border-secondary border-opacity-25 h-100">
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <span class="badge bg-info text-dark rounded-pill px-2 py-1">Step 4</span>
+                                    <h6 class="text-white fw-bold mb-0">Export & Print Report</h6>
+                                </div>
+                                <p class="text-secondary small mb-3">
+                                    Inspect past runs in <strong>History</strong>, download datasets as <strong>CSV</strong> for Excel or research, or visit <strong>Report</strong> to view and print a publication-ready academic report.
+                                </p>
+                                <a href="{{ url_for('report') }}" class="btn btn-outline-light btn-sm w-100" data-bs-dismiss="modal">
+                                    <i class="fa-solid fa-file-lines me-1"></i> View Academic Report
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-secondary border-opacity-25">
+                    <button type="button" class="btn btn-primary-custom btn-sm px-4" data-bs-dismiss="modal">Got it, let's explore!</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Main Content Container -->
     <main class="container-fluid px-4 py-4 flex-grow-1">

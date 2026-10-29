@@ -7,9 +7,12 @@
     <div class="col-12">
         <div class="d-flex flex-wrap justify-content-between align-items-center pb-3 border-bottom border-secondary border-opacity-25">
             <div>
-                <h2 class="h3 fw-bold mb-1 text-white">Cryptographic Benchmarking Lab</h2>
+                <span class="badge bg-success-subtle border border-success text-success mb-2 px-3 py-1 fw-bold">
+                    <i class="fa-solid fa-gauge-high me-1"></i> Live Hardware Performance Test
+                </span>
+                <h1 class="h3 fw-bold mb-1 text-white">Cryptographic Benchmarking Lab</h1>
                 <p class="text-secondary mb-0">
-                    High-resolution, reproducible performance evaluation of ML-KEM under controlled workloads
+                    Measure the real microsecond-speed and throughput of ML-KEM on your computer hardware.
                 </p>
             </div>
             <div class="d-flex gap-2">
@@ -21,26 +24,58 @@
     </div>
 </div>
 
+<!-- Friendly "How to Benchmark" Guide Banner -->
+<div class="row g-3 mb-4">
+    <div class="col-12">
+        <div class="card-custom p-3 border-success border-opacity-25" style="background: rgba(16, 185, 129, 0.05);">
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <i class="fa-solid fa-lightbulb text-warning fs-5"></i>
+                <h6 class="fw-bold text-white mb-0">How to Benchmark (in 3 Simple Steps)</h6>
+            </div>
+            <div class="row g-2 text-secondary small">
+                <div class="col-md-4">
+                    <div class="p-2 rounded bg-dark border border-secondary border-opacity-25 h-100">
+                        <strong class="text-info d-block mb-1">Step 1: Choose a Parameter Set</strong>
+                        We recommend leaving it as <strong>ML-KEM-768</strong> (the NIST standard default for general internet traffic).
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-2 rounded bg-dark border border-secondary border-opacity-25 h-100">
+                        <strong class="text-warning d-block mb-1">Step 2: Choose Workload Size</strong>
+                        Click one of the quick presets below (e.g. <strong>100 Trials</strong>) or type any number between 5 and 5,000.
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-2 rounded bg-dark border border-secondary border-opacity-25 h-100">
+                        <strong class="text-success d-block mb-1">Step 3: Click "Start Benchmark"</strong>
+                        The system uses hardware nanosecond timers to record actual speed. Charts and tables appear in seconds!
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="row g-4">
     <!-- Configuration Form -->
     <div class="col-lg-4">
         <div class="card-custom mb-4">
             <div class="card-header">
-                <i class="fa-solid fa-sliders text-info me-2"></i>Benchmark Configuration
+                <i class="fa-solid fa-sliders text-info me-2"></i>Configure Benchmark
             </div>
             <div class="card-body p-3">
                 <form id="benchmarkForm" onsubmit="event.preventDefault(); benchmarkLab.runBenchmark();">
                     <div class="mb-3">
-                        <label class="form-label text-secondary small fw-semibold">Parameter Set</label>
+                        <label class="form-label text-secondary small fw-semibold">1. Parameter Set</label>
                         <select id="benchParam" class="form-select form-select-dark">
-                            <option value="ML-KEM-512">ML-KEM-512 (Category 1)</option>
-                            <option value="ML-KEM-768" selected>ML-KEM-768 (Category 3 - Recommended)</option>
-                            <option value="ML-KEM-1024">ML-KEM-1024 (Category 5)</option>
+                            <option value="ML-KEM-512">ML-KEM-512 (Fastest, Category 1)</option>
+                            <option value="ML-KEM-768" selected>ML-KEM-768 (Recommended Standard, Category 3)</option>
+                            <option value="ML-KEM-1024">ML-KEM-1024 (Maximum Security, Category 5)</option>
                         </select>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label text-secondary small fw-semibold">Cryptographic Operation</label>
+                        <label class="form-label text-secondary small fw-semibold">2. Cryptographic Operation</label>
                         <select id="benchOp" class="form-select form-select-dark">
                             <option value="all" selected>All (KeyGen + Encaps + Decaps)</option>
                             <option value="keygen">Key Generation Only</option>
@@ -49,60 +84,55 @@
                         </select>
                     </div>
 
+                    <!-- Quick Preset Buttons -->
+                    <div class="mb-3">
+                        <label class="form-label text-secondary small fw-semibold">Quick Trial Presets</label>
+                        <div class="btn-group w-100" role="group">
+                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="setTrials(50)">50 (Quick)</button>
+                            <button type="button" class="btn btn-outline-info btn-sm active" onclick="setTrials(100)">100 (Normal)</button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="setTrials(500)">500 (Thorough)</button>
+                        </div>
+                    </div>
+
                     <div class="row g-2 mb-3">
                         <div class="col-6">
                             <label class="form-label text-secondary small fw-semibold">Trials Count</label>
                             <input type="number" id="benchTrials" class="form-control form-control-dark" value="100" min="5" max="5000">
-                            <div class="form-text text-muted" style="font-size: 0.72rem;">Min: 5, Max: 5000</div>
                         </div>
                         <div class="col-6">
                             <label class="form-label text-secondary small fw-semibold">Warmup Iterations</label>
                             <input type="number" id="benchWarmup" class="form-control form-control-dark" value="20" min="0" max="200">
-                            <div class="form-text text-muted" style="font-size: 0.72rem;">JIT/Cache stabilization</div>
                         </div>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label text-secondary small fw-semibold">Experimental Notes / Tag</label>
-                        <input type="text" id="benchNotes" class="form-control form-control-dark" placeholder="e.g. Standard baseline run">
+                        <label class="form-label text-secondary small fw-semibold">Experimental Label / Notes</label>
+                        <input type="text" id="benchNotes" class="form-control form-control-dark" placeholder="e.g. Standard baseline test">
                     </div>
 
-                    <button type="submit" id="btnStartBench" class="btn btn-primary-custom w-100 py-2">
-                        <i class="fa-solid fa-play me-1"></i> Start Benchmark Execution
+                    <button type="submit" id="btnStartBench" class="btn btn-primary-custom w-100 py-2 fs-6">
+                        <i class="fa-solid fa-play me-2"></i> Start Benchmark Execution
                     </button>
                 </form>
             </div>
         </div>
 
-        <!-- System Clock & Architecture Card -->
-        <div class="card-custom p-3">
+        <!-- Metric Explanation Card -->
+        <div class="card-custom p-3 border-secondary border-opacity-25">
             <h6 class="fw-bold text-white mb-2">
-                <i class="fa-solid fa-microchip text-info me-2"></i>Timing & System Architecture
+                <i class="fa-solid fa-circle-info text-info me-2"></i>Understanding the Units
             </h6>
-            <div class="small text-secondary">
-                <div class="d-flex justify-content-between py-1 border-bottom border-secondary border-opacity-25">
-                    <span>Monotonic Clock:</span>
-                    <span class="font-monospace text-info">perf_counter_ns</span>
-                </div>
-                <div class="d-flex justify-content-between py-1 border-bottom border-secondary border-opacity-25">
-                    <span>Clock Resolution:</span>
-                    <span class="font-monospace text-success">100.00 ns</span>
-                </div>
-                <div class="d-flex justify-content-between py-1 border-bottom border-secondary border-opacity-25">
-                    <span>Cryptographic Engine:</span>
-                    <span class="text-white">mlkem (FIPS 203)</span>
-                </div>
-                <div class="d-flex justify-content-between py-1">
-                    <span>Process RSS Profiling:</span>
-                    <span class="text-white">psutil + tracemalloc</span>
-                </div>
-            </div>
+            <ul class="text-secondary small mb-0 ps-3">
+                <li class="mb-1"><strong class="text-white">µs (Microseconds):</strong> $1\,\mu\text{s} = 0.000001$ seconds. The smaller the number, the faster it is!</li>
+                <li class="mb-1"><strong class="text-white">Ops/Sec (Throughput):</strong> How many operations your CPU can execute in one second.</li>
+                <li><strong class="text-white">P95 Latency:</strong> 95% of operations finished faster than this threshold.</li>
+            </ul>
         </div>
     </div>
 
     <!-- Right Results Panel -->
     <div class="col-lg-8">
-        <!-- Progress Bar & Spinner (Hidden by default) -->
+        <!-- Progress Bar & Spinner -->
         <div id="benchProgressContainer" class="card-custom p-4 mb-4 text-center d-none">
             <div class="spinner-border text-info mb-3" role="status"></div>
             <h5 class="fw-bold text-white mb-1">Executing Cryptographic Workload...</h5>
@@ -123,8 +153,11 @@
             <div class="card-body p-3">
                 <div id="emptyResultPlaceholder" class="p-5 text-center text-secondary">
                     <i class="fa-solid fa-stopwatch fa-3x mb-3 text-secondary opacity-50"></i>
-                    <h5 class="text-white fw-bold mb-2">No Active Benchmark Results</h5>
-                    <p class="small mb-0">Select your parameters on the left and click <strong>"Start Benchmark Execution"</strong> to record real measurements.</p>
+                    <h5 class="text-white fw-bold mb-2">Ready to Run!</h5>
+                    <p class="small mb-3">Choose your options on the left and click <strong>"Start Benchmark Execution"</strong> to measure real post-quantum speed on your computer.</p>
+                    <button class="btn btn-primary-custom btn-sm px-3" onclick="benchmarkLab.runBenchmark()">
+                        <i class="fa-solid fa-bolt me-1"></i> Quick 100-Trial Test
+                    </button>
                 </div>
 
                 <div id="resultsContent" class="d-none">
@@ -132,9 +165,9 @@
                     <div class="row g-3 mb-4">
                         <div class="col-sm-4">
                             <div class="metric-card">
-                                <div class="metric-label">Total Execution Time</div>
+                                <div class="metric-label">Total Duration</div>
                                 <div id="resTotalDuration" class="metric-value fs-3">—</div>
-                                <div class="metric-sub">Elapsed runtime</div>
+                                <div class="metric-sub">Full batch time</div>
                             </div>
                         </div>
                         <div class="col-sm-4">
@@ -155,14 +188,14 @@
 
                     <!-- Chart Container -->
                     <div class="mb-4 p-3 rounded bg-dark border border-secondary border-opacity-25">
-                        <h6 class="fw-bold text-white mb-3">Latency Distribution (Microseconds)</h6>
+                        <h6 class="fw-bold text-white mb-3">Latency Breakdown (Microseconds µs)</h6>
                         <div style="height: 250px;">
                             <canvas id="benchChart"></canvas>
                         </div>
                     </div>
 
                     <!-- Statistical Analysis Table -->
-                    <h6 class="fw-bold text-white mb-2">Descriptive & Inferential Statistical Summary</h6>
+                    <h6 class="fw-bold text-white mb-2">Statistical Measurement Summary</h6>
                     <div class="table-responsive">
                         <table class="table table-custom">
                             <thead>
@@ -174,7 +207,6 @@
                                     <th>P95 (µs)</th>
                                     <th>Std Dev (µs)</th>
                                     <th>Min / Max (µs)</th>
-                                    <th>95% CI (µs)</th>
                                     <th>Throughput (ops/s)</th>
                                 </tr>
                             </thead>
@@ -192,4 +224,9 @@
 
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/benchmark.js') }}"></script>
+<script>
+function setTrials(num) {
+    document.getElementById("benchTrials").value = num;
+}
+</script>
 {% endblock %}

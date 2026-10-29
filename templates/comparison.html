@@ -7,15 +7,50 @@
     <div class="col-12">
         <div class="d-flex flex-wrap justify-content-between align-items-center pb-3 border-bottom border-secondary border-opacity-25">
             <div>
-                <h2 class="h3 fw-bold mb-1 text-white">Comparative Cryptographic Analysis</h2>
+                <span class="badge bg-warning-subtle border border-warning text-warning mb-2 px-3 py-1 fw-bold">
+                    <i class="fa-solid fa-code-compare me-1"></i> Side-by-Side Analysis
+                </span>
+                <h1 class="h3 fw-bold mb-1 text-white">Comparative Cryptographic Analysis</h1>
                 <p class="text-secondary mb-0">
-                    Cross-parameter evaluation (ML-KEM-512 vs 768 vs 1024) and Classical ECDH baselines
+                    Compare ML-KEM-512, 768, and 1024, and evaluate how quantum-safe cryptography stacks up against classical Elliptic Curves.
                 </p>
             </div>
             <div class="d-flex gap-2">
                 <button id="btnRefreshComp" class="btn btn-outline-custom" onclick="comparisonView.loadAllComparisons()">
-                    <i class="fa-solid fa-arrows-rotate me-1 text-info"></i> Refresh Live Sweep
+                    <i class="fa-solid fa-arrows-rotate me-1 text-info"></i> Refresh Live Data
                 </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Friendly "Key Insights" Guide Banner -->
+<div class="row g-3 mb-4">
+    <div class="col-12">
+        <div class="card-custom p-3 border-warning border-opacity-25" style="background: rgba(245, 158, 11, 0.05);">
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <i class="fa-solid fa-lightbulb text-warning fs-5"></i>
+                <h6 class="fw-bold text-white mb-0">What Do These Charts Tell You? (Key Takeaways)</h6>
+            </div>
+            <div class="row g-2 text-secondary small">
+                <div class="col-md-4">
+                    <div class="p-2 rounded bg-dark border border-secondary border-opacity-25 h-100">
+                        <strong class="text-success d-block mb-1">⚡ Speed is Very Fast</strong>
+                        A common myth is that post-quantum crypto is slow. In reality, ML-KEM operations execute in under $100\,\mu\text{s}$ (0.0001 seconds), matching or beating many classical algorithms!
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-2 rounded bg-dark border border-secondary border-opacity-25 h-100">
+                        <strong class="text-warning d-block mb-1">📦 Key Size is the Real Trade-Off</strong>
+                        Classical keys (ECDH) are tiny (32–64 bytes). ML-KEM keys and ciphertexts are larger (~1 to 2 Kilobytes) due to high-dimensional polynomial matrices.
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-2 rounded bg-dark border border-secondary border-opacity-25 h-100">
+                        <strong class="text-info d-block mb-1">🛡️ Quantum Immune</strong>
+                        Classical curves will be broken by Shor's quantum algorithm. ML-KEM is built on the Module-LWE lattice problem, which quantum computers cannot break in polynomial time.
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -27,9 +62,9 @@
     <div class="col-lg-6">
         <div class="card-custom h-100 p-3">
             <h6 class="fw-bold text-white mb-1">
-                <i class="fa-solid fa-stopwatch text-info me-2"></i>Computational Latency by Parameter Set
+                <i class="fa-solid fa-stopwatch text-info me-2"></i>Computational Latency (Speed in µs)
             </h6>
-            <p class="text-secondary small mb-3">Median latency (µs) for KeyGen, Encapsulation, and Decapsulation</p>
+            <p class="text-secondary small mb-3">Median time in microseconds. Lower is faster.</p>
             <div style="height: 280px;">
                 <canvas id="chartLatencyComp"></canvas>
             </div>
@@ -40,9 +75,9 @@
     <div class="col-lg-6">
         <div class="card-custom h-100 p-3">
             <h6 class="fw-bold text-white mb-1">
-                <i class="fa-solid fa-network-wired text-warning me-2"></i>Communication Transmission Overhead
+                <i class="fa-solid fa-network-wired text-warning me-2"></i>Communication Wire Size (Bytes)
             </h6>
-            <p class="text-secondary small mb-3">Public Key ($ek$) and Ciphertext ($c$) wire transmission in bytes</p>
+            <p class="text-secondary small mb-3">Total network data sent (Public Key + Ciphertext).</p>
             <div style="height: 280px;">
                 <canvas id="chartSizeComp"></canvas>
             </div>
@@ -55,9 +90,9 @@
     <div class="col-lg-6">
         <div class="card-custom h-100 p-3">
             <h6 class="fw-bold text-white mb-1">
-                <i class="fa-solid fa-gauge-high text-success me-2"></i>Operation Throughput (Operations/Sec)
+                <i class="fa-solid fa-gauge-high text-success me-2"></i>Operation Throughput (Operations / Second)
             </h6>
-            <p class="text-secondary small mb-3">Sustained single-core throughput across parameter sets</p>
+            <p class="text-secondary small mb-3">Sustained operations per second on this CPU. Higher is better.</p>
             <div style="height: 280px;">
                 <canvas id="chartThroughputComp"></canvas>
             </div>
@@ -68,9 +103,9 @@
     <div class="col-lg-6">
         <div class="card-custom h-100 p-3">
             <h6 class="fw-bold text-white mb-1">
-                <i class="fa-solid fa-scale-balanced text-primary me-2"></i>Classical ECDH vs Post-Quantum ML-KEM
+                <i class="fa-solid fa-scale-balanced text-primary me-2"></i>Classical Curves vs. Post-Quantum ML-KEM
             </h6>
-            <p class="text-secondary small mb-3">Communication overhead: Curve25519 vs NIST P-256 vs ML-KEM-768</p>
+            <p class="text-secondary small mb-3">Wire exchange comparison: Curve25519 vs NIST P-256 vs ML-KEM-768.</p>
             <div style="height: 280px;">
                 <canvas id="chartClassicalComp"></canvas>
             </div>
@@ -83,7 +118,7 @@
     <div class="col-12">
         <div class="card-custom">
             <div class="card-header">
-                <i class="fa-solid fa-table-list text-info me-2"></i>Comprehensive Parameter Specification & Benchmark Matrix
+                <i class="fa-solid fa-table-list text-info me-2"></i>Parameter Specification & Benchmark Matrix
             </div>
             <div class="table-responsive">
                 <table class="table table-custom">
@@ -103,7 +138,6 @@
                         </tr>
                     </thead>
                     <tbody id="compTableBody">
-                        <!-- Populated dynamically via JS -->
                         <tr><td colspan="11" class="text-center py-4 text-secondary">Loading comparative sweep data...</td></tr>
                     </tbody>
                 </table>

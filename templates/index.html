@@ -3,22 +3,123 @@
 {% block title %}Overview Dashboard | ML-KEM Benchmarking Platform{% endblock %}
 
 {% block content %}
+<!-- Top Header Banner -->
 <div class="row g-4 mb-4">
     <div class="col-12">
         <div class="d-flex flex-wrap justify-content-between align-items-center pb-3 border-bottom border-secondary border-opacity-25">
             <div>
-                <h2 class="h3 fw-bold mb-1 text-white">Post-Quantum Cryptography Benchmarking</h2>
+                <span class="badge bg-info-subtle border border-info text-info mb-2 px-3 py-1 fw-bold">
+                    <i class="fa-solid fa-atom me-1"></i> Post-Quantum Cryptography &bull; NIST FIPS 203
+                </span>
+                <h1 class="h3 fw-bold mb-1 text-white">ML-KEM Key Encapsulation & Benchmarking Platform</h1>
                 <p class="text-secondary mb-0">
-                    Evaluation of NIST FIPS 203 Module-Lattice-Based Key-Encapsulation Mechanism (ML-KEM)
+                    A simple, interactive laboratory platform to understand, simulate, and benchmark quantum-resistant encryption.
                 </p>
             </div>
             <div class="d-flex gap-2 mt-2 mt-sm-0">
-                <a href="{{ url_for('demonstration') }}" class="btn btn-outline-custom">
-                    <i class="fa-solid fa-play me-1 text-info"></i> Interactive Demo
+                <button class="btn btn-outline-info text-info" data-bs-toggle="modal" data-bs-target="#howToUseModal">
+                    <i class="fa-solid fa-circle-question me-1"></i> Quick Guide
+                </button>
+                <a href="{{ url_for('demonstration') }}" class="btn btn-primary-custom">
+                    <i class="fa-solid fa-play me-1"></i> Start Interactive Demo
                 </a>
-                <a href="{{ url_for('benchmark') }}" class="btn btn-primary-custom">
-                    <i class="fa-solid fa-bolt me-1"></i> New Benchmark
-                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Simple "How to Use This Website" 4-Step Guide Section -->
+<div class="row g-3 mb-4">
+    <div class="col-12">
+        <div class="card-custom p-4 border-info border-opacity-25" style="background: linear-gradient(180deg, #111827 0%, #0d1321 100%);">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold text-white mb-0">
+                    <i class="fa-solid fa-compass text-info me-2"></i>How to Use This Website in 4 Easy Steps
+                </h5>
+                <span class="badge bg-secondary-subtle border border-secondary text-secondary small">
+                    Beginner-Friendly Tour
+                </span>
+            </div>
+            <p class="text-secondary small mb-3">
+                This platform is built to make Post-Quantum Cryptography simple to understand and benchmark. Follow these straightforward steps:
+            </p>
+
+            <div class="row g-3">
+                <!-- Step 1 Card -->
+                <div class="col-lg-3 col-md-6">
+                    <div class="p-3 rounded bg-black border border-secondary border-opacity-25 h-100 d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <span class="badge bg-primary rounded-pill px-2 py-1">Step 1</span>
+                                <i class="fa-solid fa-key text-primary fs-5"></i>
+                            </div>
+                            <h6 class="fw-bold text-white mb-1">Try the Demo</h6>
+                            <p class="text-secondary small mb-3" style="font-size: 0.82rem;">
+                                Experience key exchange between Alice and Bob. Click 4 simple buttons to create keys, encapsulate a secret, and verify constant-time matching.
+                            </p>
+                        </div>
+                        <a href="{{ url_for('demonstration') }}" class="btn btn-outline-primary btn-sm w-100">
+                            <i class="fa-solid fa-play me-1"></i> Step 1: Open Demo
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Step 2 Card -->
+                <div class="col-lg-3 col-md-6">
+                    <div class="p-3 rounded bg-black border border-secondary border-opacity-25 h-100 d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <span class="badge bg-success text-dark rounded-pill px-2 py-1">Step 2</span>
+                                <i class="fa-solid fa-stopwatch text-success fs-5"></i>
+                            </div>
+                            <h6 class="fw-bold text-white mb-1">Run a Benchmark</h6>
+                            <p class="text-secondary small mb-3" style="font-size: 0.82rem;">
+                                Test the true cryptographic speed on your machine. Pick ML-KEM-768, select 100 trials, and watch microsecond execution graphs appear live!
+                            </p>
+                        </div>
+                        <a href="{{ url_for('benchmark') }}" class="btn btn-outline-success btn-sm w-100">
+                            <i class="fa-solid fa-bolt me-1"></i> Step 2: Benchmark Lab
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Step 3 Card -->
+                <div class="col-lg-3 col-md-6">
+                    <div class="p-3 rounded bg-black border border-secondary border-opacity-25 h-100 d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <span class="badge bg-warning text-dark rounded-pill px-2 py-1">Step 3</span>
+                                <i class="fa-solid fa-chart-column text-warning fs-5"></i>
+                            </div>
+                            <h6 class="fw-bold text-white mb-1">Compare Parameters</h6>
+                            <p class="text-secondary small mb-3" style="font-size: 0.82rem;">
+                                Compare ML-KEM-512, 768, and 1024 side-by-side. See how quantum-safe cryptography compares to classical Elliptic Curves (ECDH).
+                            </p>
+                        </div>
+                        <a href="{{ url_for('comparison') }}" class="btn btn-outline-warning btn-sm w-100">
+                            <i class="fa-solid fa-code-compare me-1"></i> Step 3: View Charts
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Step 4 Card -->
+                <div class="col-lg-3 col-md-6">
+                    <div class="p-3 rounded bg-black border border-secondary border-opacity-25 h-100 d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <span class="badge bg-info text-dark rounded-pill px-2 py-1">Step 4</span>
+                                <i class="fa-solid fa-file-export text-info fs-5"></i>
+                            </div>
+                            <h6 class="fw-bold text-white mb-1">Export & Report</h6>
+                            <p class="text-secondary small mb-3" style="font-size: 0.82rem;">
+                                Download your benchmark data as a clean CSV for Excel/Pandas, or open and print the full academic project report for evaluation.
+                            </p>
+                        </div>
+                        <a href="{{ url_for('report') }}" class="btn btn-outline-info btn-sm w-100">
+                            <i class="fa-solid fa-file-lines me-1"></i> Step 4: Open Report
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -31,103 +132,115 @@
             <div class="metric-label">Total Benchmark Runs</div>
             <div class="metric-value">{{ summary.total_benchmark_runs }}</div>
             <div class="metric-sub">
-                <i class="fa-solid fa-database me-1"></i> SQLite Persisted Runs
+                <i class="fa-solid fa-database me-1 text-info"></i> Recorded in Local SQLite
             </div>
         </div>
     </div>
     <div class="col-md-3 col-sm-6">
         <div class="metric-card green">
-            <div class="metric-label">KeyGen Median Latency</div>
+            <div class="metric-label">KeyGen Median Speed</div>
             <div class="metric-value">
                 {% if summary.median_latencies.keygen_median_us %}
                     {{ summary.median_latencies.keygen_median_us }} <span class="fs-6 fw-normal text-secondary">µs</span>
                 {% else %}
-                    <span class="fs-5 text-secondary">No Data</span>
+                    <span class="fs-5 text-secondary">Ready to test</span>
                 {% endif %}
             </div>
             <div class="metric-sub">
-                <i class="fa-solid fa-clock me-1"></i> Latest Benchmark Trial
+                <i class="fa-solid fa-clock me-1 text-success"></i> 1 µs = 0.000001 seconds
             </div>
         </div>
     </div>
     <div class="col-md-3 col-sm-6">
         <div class="metric-card amber">
-            <div class="metric-label">Encaps Median Latency</div>
+            <div class="metric-label">Encaps Median Speed</div>
             <div class="metric-value">
                 {% if summary.median_latencies.encaps_median_us %}
                     {{ summary.median_latencies.encaps_median_us }} <span class="fs-6 fw-normal text-secondary">µs</span>
                 {% else %}
-                    <span class="fs-5 text-secondary">No Data</span>
+                    <span class="fs-5 text-secondary">Ready to test</span>
                 {% endif %}
             </div>
             <div class="metric-sub">
-                <i class="fa-solid fa-arrow-right-to-bracket me-1"></i> Public-Key Encapsulation
+                <i class="fa-solid fa-lock me-1 text-warning"></i> Public-Key Encapsulation
             </div>
         </div>
     </div>
     <div class="col-md-3 col-sm-6">
         <div class="metric-card indigo">
-            <div class="metric-label">Decaps Median Latency</div>
+            <div class="metric-label">Decaps Median Speed</div>
             <div class="metric-value">
                 {% if summary.median_latencies.decaps_median_us %}
                     {{ summary.median_latencies.decaps_median_us }} <span class="fs-6 fw-normal text-secondary">µs</span>
                 {% else %}
-                    <span class="fs-5 text-secondary">No Data</span>
+                    <span class="fs-5 text-secondary">Ready to test</span>
                 {% endif %}
             </div>
             <div class="metric-sub">
-                <i class="fa-solid fa-arrow-right-from-bracket me-1"></i> Private-Key Recovery
+                <i class="fa-solid fa-unlock me-1 text-primary"></i> Private-Key Recovery
             </div>
         </div>
     </div>
 </div>
 
-<!-- Parameter Sets Grid -->
+<!-- Parameter Sets Grid with Plain-English Explanations -->
 <div class="row g-4 mb-4">
     <div class="col-12">
-        <h4 class="h5 fw-bold text-white mb-3">
-            <i class="fa-solid fa-cubes text-info me-2"></i>Standardized Parameter Sets (NIST FIPS 203)
-        </h4>
+        <div class="d-flex justify-content-between align-items-center mb-1">
+            <h4 class="h5 fw-bold text-white mb-0">
+                <i class="fa-solid fa-cubes text-info me-2"></i>The 3 ML-KEM Parameter Sets (Explained Simply)
+            </h4>
+            <span class="text-secondary small">NIST FIPS 203 Standard</span>
+        </div>
+        <p class="text-secondary small mb-3">
+            ML-KEM comes in 3 standardized sizes. Think of them as <strong>Small</strong>, <strong>Medium (Recommended)</strong>, and <strong>Large</strong>:
+        </p>
     </div>
     {% for name, param in parameters.items() %}
     <div class="col-lg-4 col-md-6">
-        <div class="card-custom h-100 p-3">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <span class="badge-param {% if name == 'ML-KEM-512' %}mlkem-512{% elif name == 'ML-KEM-768' %}mlkem-768{% else %}mlkem-1024{% endif %}">
-                    {{ name }}
-                </span>
-                <span class="badge bg-secondary-subtle border border-secondary text-secondary">
-                    NIST Category {{ param.nist_category }}
-                </span>
-            </div>
-            <h5 class="fw-bold text-white mb-1">{{ param.classical_security_equiv }} Equivalence</h5>
-            <p class="text-secondary small mb-3">{{ param.description }}</p>
-            
-            <div class="p-2 rounded bg-dark border border-secondary border-opacity-25 small mb-3">
-                <div class="d-flex justify-content-between py-1 border-bottom border-secondary border-opacity-25">
-                    <span class="text-muted">Module Rank ($k$):</span>
-                    <span class="font-monospace text-white">{{ param.matrix_dim_k }} &times; {{ param.matrix_dim_k }}</span>
+        <div class="card-custom h-100 p-3 d-flex flex-column justify-content-between">
+            <div>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="badge-param {% if name == 'ML-KEM-512' %}mlkem-512{% elif name == 'ML-KEM-768' %}mlkem-768{% else %}mlkem-1024{% endif %}">
+                        {{ name }}
+                    </span>
+                    <span class="badge {% if name == 'ML-KEM-768' %}bg-success text-dark fw-bold{% else %}bg-secondary-subtle border border-secondary text-secondary{% endif %}">
+                        {% if name == 'ML-KEM-768' %}Recommended Default{% else %}NIST Category {{ param.nist_category }}{% endif %}
+                    </span>
                 </div>
-                <div class="d-flex justify-content-between py-1 border-bottom border-secondary border-opacity-25">
-                    <span class="text-muted">Public Key ($ek$):</span>
-                    <span class="font-monospace text-info">{{ param.public_key_bytes }} Bytes</span>
-                </div>
-                <div class="d-flex justify-content-between py-1 border-bottom border-secondary border-opacity-25">
-                    <span class="text-muted">Private Key ($dk$):</span>
-                    <span class="font-monospace text-secondary">{{ param.private_key_bytes }} Bytes</span>
-                </div>
-                <div class="d-flex justify-content-between py-1 border-bottom border-secondary border-opacity-25">
-                    <span class="text-muted">Ciphertext ($c$):</span>
-                    <span class="font-monospace text-warning">{{ param.ciphertext_bytes }} Bytes</span>
-                </div>
-                <div class="d-flex justify-content-between py-1">
-                    <span class="text-muted">Shared Secret ($K$):</span>
-                    <span class="font-monospace text-success">{{ param.shared_secret_bytes }} Bytes</span>
+                <h5 class="fw-bold text-white mb-1">{{ param.classical_security_equiv }} Equivalence</h5>
+                <p class="text-secondary small mb-3">
+                    {% if name == 'ML-KEM-512' %}
+                        ⚡ <strong>Fastest & Smallest:</strong> Perfect for resource-constrained IoT devices and lightweight sensors.
+                    {% elif name == 'ML-KEM-768' %}
+                        ⭐ <strong>Recommended Standard:</strong> The sweet spot balancing high quantum resistance with high throughput for general internet traffic.
+                    {% else %}
+                        🛡️ <strong>Maximum Security:</strong> For national security assets, top-secret government data, and long-term classified archiving.
+                    {% endif %}
+                </p>
+                
+                <div class="p-2 rounded bg-dark border border-secondary border-opacity-25 small mb-3">
+                    <div class="d-flex justify-content-between py-1 border-bottom border-secondary border-opacity-25">
+                        <span class="text-muted">Public Key ($ek$):</span>
+                        <span class="font-monospace text-info fw-bold">{{ param.public_key_bytes }} Bytes</span>
+                    </div>
+                    <div class="d-flex justify-content-between py-1 border-bottom border-secondary border-opacity-25">
+                        <span class="text-muted">Ciphertext ($c$):</span>
+                        <span class="font-monospace text-warning fw-bold">{{ param.ciphertext_bytes }} Bytes</span>
+                    </div>
+                    <div class="d-flex justify-content-between py-1 border-bottom border-secondary border-opacity-25">
+                        <span class="text-muted">Private Key ($dk$):</span>
+                        <span class="font-monospace text-secondary">{{ param.private_key_bytes }} Bytes (RAM only)</span>
+                    </div>
+                    <div class="d-flex justify-content-between py-1">
+                        <span class="text-muted">Shared Secret ($K$):</span>
+                        <span class="font-monospace text-success fw-bold">{{ param.shared_secret_bytes }} Bytes (AES-256 seed)</span>
+                    </div>
                 </div>
             </div>
 
             <a href="{{ url_for('demonstration') }}?param={{ name }}" class="btn btn-outline-custom btn-sm w-100">
-                <i class="fa-solid fa-play me-1"></i> Test {{ name }}
+                <i class="fa-solid fa-play me-1 text-info"></i> Test {{ name }} in Demo
             </a>
         </div>
     </div>
