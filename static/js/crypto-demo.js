@@ -1,6 +1,6 @@
 /**
  * Cryptographic Demonstration & Messaging Studio Controller
- * Interactive NIST FIPS 203 ML-KEM State Machine & AES-256-GCM AEAD Engine
+ * NIST FIPS 203 ML-KEM Key Encapsulation & AES-256-GCM AEAD Engine
  */
 
 class CryptoDemo {
@@ -16,166 +16,12 @@ class CryptoDemo {
         this.lastNonceHex = null;
         this.isTampered = false;
 
-        // Sound Engine
-        this.soundEnabled = true;
-        this.audioCtx = null;
-
         // DOM elements
         this.logContainer = document.getElementById("demoLogContainer");
         this.initUrlParams();
 
         // Initialize byte counter on page load
         setTimeout(() => this.updateByteCount(), 100);
-    }
-
-    /* -------------------------------------------------------------------------
-       Web Audio API Synthesizer (Zero External Dependencies)
-       ------------------------------------------------------------------------- */
-    getAudioContext() {
-        if (!this.audioCtx) {
-            const AudioContext = window.AudioContext || window.webkitAudioContext;
-            if (AudioContext) {
-                this.audioCtx = new AudioContext();
-            }
-        }
-        if (this.audioCtx && this.audioCtx.state === "suspended") {
-            this.audioCtx.resume();
-        }
-        return this.audioCtx;
-    }
-
-    toggleSound() {
-        this.soundEnabled = !this.soundEnabled;
-        const icon = document.getElementById("soundIcon");
-        const text = document.getElementById("soundText");
-        if (this.soundEnabled) {
-            icon.className = "fa-solid fa-volume-high text-info me-1";
-            text.textContent = "Sound: ON";
-            this.playChime([520, 650]);
-        } else {
-            icon.className = "fa-solid fa-volume-xmark text-secondary me-1";
-            text.textContent = "Sound: OFF";
-        }
-    }
-
-    playChime(freqs, type = "sine", duration = 0.12) {
-        if (!this.soundEnabled) return;
-        try {
-            const ctx = this.getAudioContext();
-            if (!ctx) return;
-            const now = ctx.currentTime;
-            freqs.forEach((freq, idx) => {
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
-                osc.type = type;
-                osc.frequency.setValueAtTime(freq, now + idx * 0.08);
-
-                gain.gain.setValueAtTime(0.08, now + idx * 0.08);
-                gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.08 + duration);
-
-                osc.connect(gain);
-                gain.connect(ctx.destination);
-                osc.start(now + idx * 0.08);
-                osc.stop(now + idx * 0.08 + duration + 0.05);
-            });
-        } catch (e) {
-            // Audio context policy fallback
-        }
-    }
-
-    soundKeygen() {
-        this.playChime([440, 554, 659, 880], "triangle", 0.15);
-    }
-
-    soundTransmit() {
-        if (!this.soundEnabled) return;
-        try {
-            const ctx = this.getAudioContext();
-            if (!ctx) return;
-            const now = ctx.currentTime;
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            osc.type = "sine";
-            osc.frequency.setValueAtTime(900, now);
-            osc.frequency.exponentialRampToValueAtTime(350, now + 0.35);
-
-            gain.gain.setValueAtTime(0.06, now);
-            gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.35);
-
-            osc.connect(gain);
-            gain.connect(ctx.destination);
-            osc.start(now);
-            osc.stop(now + 0.4);
-        } catch (e) {}
-    }
-
-    soundSuccess() {
-        this.playChime([523.25, 659.25, 783.99, 1046.50], "sine", 0.25);
-    }
-
-    soundTamper() {
-        if (!this.soundEnabled) return;
-        try {
-            const ctx = this.getAudioContext();
-            if (!ctx) return;
-            const now = ctx.currentTime;
-            const osc1 = ctx.createOscillator();
-            const osc2 = ctx.createOscillator();
-            const gain = ctx.createGain();
-
-            osc1.type = "sawtooth";
-            osc2.type = "square";
-            osc1.frequency.setValueAtTime(160, now);
-            osc2.frequency.setValueAtTime(235, now);
-
-            gain.gain.setValueAtTime(0.1, now);
-            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
-
-            osc1.connect(gain);
-            osc2.connect(gain);
-            gain.connect(ctx.destination);
-
-            osc1.start(now);
-            osc2.start(now);
-            osc1.stop(now + 0.45);
-            osc2.stop(now + 0.45);
-        } catch (e) {}
-    }
-
-    /* -------------------------------------------------------------------------
-       Visual Channel Animations & Packets
-       ------------------------------------------------------------------------- */
-    animateNode(nodeId, pulseClass, durationMs = 1200) {
-        const node = document.getElementById(nodeId);
-        if (!node) return;
-        node.classList.remove("active-pulse-cyan", "active-pulse-amber", "active-pulse-green");
-        void node.offsetWidth; // Force DOM reflow
-        node.classList.add(pulseClass);
-        setTimeout(() => {
-            node.classList.remove(pulseClass);
-        }, durationMs);
-    }
-
-    animatePacket(packetId, direction, durationMs = 2200) {
-        const packet = document.getElementById(packetId);
-        if (!packet) return;
-
-        packet.classList.remove("animate-east", "animate-west");
-        void packet.offsetWidth; // Force DOM reflow
-
-        const animClass = direction === "east" ? "animate-east" : "animate-west";
-        packet.classList.add(animClass);
-
-        setTimeout(() => {
-            packet.classList.remove(animClass);
-        }, durationMs);
-    }
-
-    setChannelStatus(text, iconClass = "fa-wifi text-info") {
-        const textEl = document.getElementById("channelStatusText");
-        const iconEl = document.getElementById("channelIcon");
-        if (textEl) textEl.innerHTML = text;
-        if (iconEl) iconEl.className = `fa-solid ${iconClass}`;
     }
 
     /* -------------------------------------------------------------------------
@@ -208,12 +54,16 @@ class CryptoDemo {
         const logEntry = document.createElement("div");
         logEntry.className = `py-1 ${colorClass}`;
         logEntry.innerHTML = `<span class="text-muted">[${timestamp}]</span> ${message}`;
-        this.logContainer.appendChild(logEntry);
-        this.logContainer.scrollTop = this.logContainer.scrollHeight;
+        if (this.logContainer) {
+            this.logContainer.appendChild(logEntry);
+            this.logContainer.scrollTop = this.logContainer.scrollHeight;
+        }
     }
 
     clearLog() {
-        this.logContainer.innerHTML = `<div class="text-secondary">// Activity log cleared.</div>`;
+        if (this.logContainer) {
+            this.logContainer.innerHTML = `<div class="text-secondary">// Activity log cleared.</div>`;
+        }
     }
 
     /* -------------------------------------------------------------------------
@@ -226,8 +76,6 @@ class CryptoDemo {
         if (btnKeygen) btnKeygen.disabled = true;
 
         this.log(`Alice initiating key pair generation for <strong>${paramSet}</strong>...`, "accent");
-        this.animateNode("aliceNodeBox", "active-pulse-cyan", 2000);
-        this.soundKeygen();
 
         try {
             const res = await fetch("/api/kem/keygen", {
@@ -245,24 +93,12 @@ class CryptoDemo {
             this.sessionId = data.session_id;
             this.keyId = data.key_id;
 
-            document.getElementById("sessionBadge").textContent = `Session: ${this.sessionId.substring(0, 8)}...`;
-            document.getElementById("aliceEkBadge").innerHTML = `<span class="status-dot dot-cyan me-1"></span> Public Key: <strong>${data.public_key_len} B</strong>`;
-            document.getElementById("aliceDkBadge").innerHTML = `<span class="status-dot dot-cyan me-1"></span> Private Key: <strong>${data.private_key_len} B (RAM)</strong>`;
-            document.getElementById("packetEkText").textContent = `Public Key (${data.public_key_len} B)`;
+            const sessionBadge = document.getElementById("sessionBadge");
+            if (sessionBadge) sessionBadge.textContent = `Session: ${this.sessionId.substring(0, 8)}...`;
 
             this.log(`✓ Alice generated keypair in <strong>${data.execution_time_us.toFixed(2)} µs</strong>`, "success");
             this.log(`  &bull; Public Key (ek): <strong>${data.public_key_len} bytes</strong> (Preview: ${data.metadata.public_key_hex_preview})`);
-            this.log(`  &bull; Private Key (dk): <strong>${data.private_key_len} bytes</strong> (Retained safely in RAM)`, "warning");
-
-            // Animate Public Key flying from Alice to Bob
-            this.setChannelStatus(`Transmitting Alice's Public Key (${data.public_key_len} bytes) to Bob...`, "fa-arrow-right text-info");
-            this.animatePacket("packetPublicKey", "east");
-            this.soundTransmit();
-
-            setTimeout(() => {
-                this.setChannelStatus(`Bob received Alice's Public Key. Ready to encapsulate.`, "fa-check text-success");
-                this.animateNode("bobNodeBox", "active-pulse-amber", 1200);
-            }, 2100);
+            this.log(`  &bull; Private Key (dk): <strong>${data.private_key_len} bytes</strong> (Retained safely in server memory)`, "warning");
 
             const btnEncaps = document.getElementById("btnEncaps");
             if (btnEncaps) btnEncaps.disabled = false;
@@ -287,7 +123,6 @@ class CryptoDemo {
         if (btnEncaps) btnEncaps.disabled = true;
 
         this.log(`Bob encapsulating fresh shared secret using Alice's public key...`, "accent");
-        this.animateNode("bobNodeBox", "active-pulse-amber", 2000);
 
         try {
             const res = await fetch("/api/kem/encapsulate", {
@@ -302,23 +137,9 @@ class CryptoDemo {
             const data = await res.json();
             if (!res.ok) throw new Error(data.error || "Encapsulation failed");
 
-            document.getElementById("bobSecretBadge").innerHTML = `<span class="status-dot dot-amber me-1"></span> Secret (K): <strong>32 Bytes (Protected)</strong>`;
-            document.getElementById("bobCtBadge").innerHTML = `<span class="status-dot dot-amber me-1"></span> Ciphertext: <strong>${data.ciphertext_len} B</strong>`;
-            document.getElementById("packetCtText").textContent = `Ciphertext (${data.ciphertext_len} B)`;
-
             this.log(`✓ Bob encapsulation successful in <strong>${data.execution_time_us.toFixed(2)} µs</strong>`, "success");
             this.log(`  &bull; Ciphertext (ct): <strong>${data.ciphertext_len} bytes</strong> (Preview: ${data.ciphertext_hex_preview})`);
-            this.log(`  &bull; Bob's Shared Secret: <strong>32 bytes</strong> established in RAM.`, "warning");
-
-            // Animate Ciphertext flying from Bob to Alice
-            this.setChannelStatus(`Transmitting Ciphertext (${data.ciphertext_len} bytes) back to Alice...`, "fa-arrow-left text-warning");
-            this.animatePacket("packetCiphertext", "west");
-            this.soundTransmit();
-
-            setTimeout(() => {
-                this.setChannelStatus(`Alice received Ciphertext. Ready to decapsulate.`, "fa-box-open text-primary");
-                this.animateNode("aliceNodeBox", "active-pulse-cyan", 1200);
-            }, 2100);
+            this.log(`  &bull; Bob's Shared Secret: <strong>32 bytes</strong> established in memory.`, "warning");
 
             const btnDecaps = document.getElementById("btnDecaps");
             if (btnDecaps) btnDecaps.disabled = false;
@@ -341,7 +162,6 @@ class CryptoDemo {
         if (btnDecaps) btnDecaps.disabled = true;
 
         this.log(`Alice decapsulating ciphertext using matching private key...`, "accent");
-        this.animateNode("aliceNodeBox", "active-pulse-cyan", 1500);
 
         try {
             const res = await fetch("/api/kem/decapsulate", {
@@ -361,7 +181,6 @@ class CryptoDemo {
 
             const btnVerify = document.getElementById("btnVerify");
             if (btnVerify) btnVerify.disabled = false;
-            this.setChannelStatus(`Secrets derived on both endpoints. Click "Verify Secrets Match".`, "fa-shield-halved text-info");
             return true;
         } catch (err) {
             this.log(`[-] Error: ${err.message}`, "error");
@@ -395,7 +214,6 @@ class CryptoDemo {
 
             if (data.verified_match) {
                 this.isVerified = true;
-                this.soundSuccess();
 
                 this.log(`=================================================================`, "success");
                 this.log(`★ SECRET MATCH: SUCCESS (Alice and Bob hold the identical 32-byte secret!)`, "success");
@@ -403,19 +221,14 @@ class CryptoDemo {
                 this.log(`  &bull; Post-Quantum Messaging Studio is ready for authenticated AES-256-GCM.`, "success");
                 this.log(`=================================================================`, "success");
 
-                this.animateNode("aliceNodeBox", "active-pulse-green", 2500);
-                this.animateNode("bobNodeBox", "active-pulse-green", 2500);
-                this.setChannelStatus(`Quantum-Safe Symmetric Channel Established! (AES-256-GCM Active)`, "fa-lock text-success");
-
                 const statusBadge = document.getElementById("studioKeyStatusBadge");
                 if (statusBadge) {
                     statusBadge.className = "badge bg-success-subtle border border-success text-success px-3 py-2";
-                    statusBadge.innerHTML = `<i class="fa-solid fa-circle-check me-1"></i> Channel Active &bull; ML-KEM Shared Secret Linked`;
+                    statusBadge.innerHTML = `<i class="fa-solid fa-circle-check me-1"></i> ML-KEM Key Agreement Verified (Quantum-Safe)`;
                 }
                 return true;
             } else {
                 this.isVerified = false;
-                this.soundTamper();
                 this.log(`=================================================================`, "error");
                 this.log(`✗ SECRET MISMATCH: FAILURE! Keys do not match.`, "error");
                 this.log(`  &bull; Reason: ${data.message}`, "error");
@@ -442,15 +255,12 @@ class CryptoDemo {
         const s1 = await this.generateKeyPair();
         if (!s1) { if (btnAuto) btnAuto.disabled = false; return false; }
 
-        await new Promise(r => setTimeout(r, 600));
         const s2 = await this.encapsulate();
         if (!s2) { if (btnAuto) btnAuto.disabled = false; return false; }
 
-        await new Promise(r => setTimeout(r, 600));
         const s3 = await this.decapsulate();
         if (!s3) { if (btnAuto) btnAuto.disabled = false; return false; }
 
-        await new Promise(r => setTimeout(r, 400));
         const s4 = await this.verifySecrets();
 
         if (btnAuto) btnAuto.disabled = false;
@@ -464,7 +274,6 @@ class CryptoDemo {
         this.log(`[NEGATIVE TEST] Injecting bit flips into ML-KEM ciphertext to test implicit rejection...`, "warning");
         const btnCorrupt = document.getElementById("btnCorruptCT");
         if (btnCorrupt) btnCorrupt.disabled = true;
-        this.soundTamper();
 
         const ctBytesLen = this.parameterSet === "ML-KEM-512" ? 768 : (this.parameterSet === "ML-KEM-768" ? 1088 : 1568);
         const corruptedHex = "ff" + "aa".repeat(ctBytesLen - 1);
@@ -557,7 +366,6 @@ class CryptoDemo {
         }
 
         this.log(`Bob encrypting confidential message using AES-256-GCM keyed by ML-KEM shared secret...`, "accent");
-        this.animateNode("bobNodeBox", "active-pulse-amber", 1500);
 
         try {
             const res = await fetch("/api/kem/encrypt-message", {
@@ -612,31 +420,21 @@ class CryptoDemo {
             this.log(`  &bull; Algorithm: <strong>${data.algorithm}</strong>`);
             this.log(`  &bull; IV/Nonce: ${data.nonce_hex}`);
 
-            // Transmit packet across the wire to Alice
-            this.setChannelStatus(`Transmitting AES-256-GCM Encrypted Payload to Alice...`, "fa-lock text-success");
-            this.animatePacket("packetMessage", "west");
-            this.soundTransmit();
+            const inboxBadge = document.getElementById("inboxStatusBadge");
+            if (inboxBadge) {
+                inboxBadge.className = "badge bg-primary text-white";
+                inboxBadge.innerHTML = `<i class="fa-solid fa-envelope me-1"></i> Message Waiting`;
+            }
 
-            setTimeout(() => {
-                this.setChannelStatus(`Encrypted payload delivered to Alice's inbox. Ready to decrypt!`, "fa-envelope text-info");
-                this.animateNode("aliceNodeBox", "active-pulse-cyan", 1200);
+            const btnDecrypt = document.getElementById("btnDecryptMessage");
+            if (btnDecrypt) btnDecrypt.disabled = false;
 
-                const inboxBadge = document.getElementById("inboxStatusBadge");
-                if (inboxBadge) {
-                    inboxBadge.className = "badge bg-primary text-white";
-                    inboxBadge.innerHTML = `<i class="fa-solid fa-envelope me-1"></i> Message Waiting`;
-                }
-
-                const btnDecrypt = document.getElementById("btnDecryptMessage");
-                if (btnDecrypt) btnDecrypt.disabled = false;
-
-                const placeholder = document.getElementById("decryptPlaceholderText");
-                if (placeholder) placeholder.textContent = "Encrypted transmission waiting in inbox. Click 'Decrypt Message with Alice\'s Key' to read!";
-                const successBox = document.getElementById("decryptSuccessContent");
-                if (successBox) successBox.style.display = "none";
-                const failureBox = document.getElementById("decryptFailureContent");
-                if (failureBox) failureBox.style.display = "none";
-            }, 2100);
+            const placeholder = document.getElementById("decryptPlaceholderText");
+            if (placeholder) placeholder.textContent = "Encrypted transmission waiting in inbox. Click 'Decrypt Message with Alice\'s Key' to read!";
+            const successBox = document.getElementById("decryptSuccessContent");
+            if (successBox) successBox.style.display = "none";
+            const failureBox = document.getElementById("decryptFailureContent");
+            if (failureBox) failureBox.style.display = "none";
 
         } catch (err) {
             this.log(`[-] Message Encryption Error: ${err.message}`, "error");
@@ -651,7 +449,6 @@ class CryptoDemo {
         if (!currentHex && this.lastCiphertextHex) currentHex = this.lastCiphertextHex;
         if (!currentHex) return;
 
-        this.soundTamper();
         this.isTampered = true;
 
         // Flip bytes in the ciphertext hex string
@@ -675,8 +472,6 @@ class CryptoDemo {
 
         this.log(`[ATTACK SIMULATION] Man-in-the-Middle bit-flip injected into transmission payload!`, "error");
         this.log(`  &bull; Byte 0 altered. Click Alice's Decrypt button to test AEAD tag authentication.`, "warning");
-
-        this.setChannelStatus(`[ALERT] In-Transit Tampering Detected! Packet modified on wire.`, "fa-triangle-exclamation text-danger");
     }
 
     restoreOriginalCiphertext() {
@@ -697,7 +492,6 @@ class CryptoDemo {
         if (btnRestore) btnRestore.disabled = true;
 
         this.log(`Transmission payload restored to original authentic ciphertext.`, "info");
-        this.setChannelStatus(`Transmission payload restored to authentic state.`, "fa-check text-success");
     }
 
     async decryptMessage() {
@@ -724,7 +518,6 @@ class CryptoDemo {
         if (btnDecrypt) btnDecrypt.disabled = true;
 
         this.log(`Alice decrypting received message with ML-KEM recovered secret key...`, "accent");
-        this.animateNode("aliceNodeBox", "active-pulse-cyan", 1500);
 
         try {
             const res = await fetch("/api/kem/decrypt-message", {
@@ -753,10 +546,7 @@ class CryptoDemo {
 
             if (data.status === "success" && data.authenticated) {
                 // SUCCESS: Authenticated decryption
-                this.soundSuccess();
                 if (container) {
-                    container.classList.remove("animate-tamper-shake");
-                    container.classList.add("animate-unlock");
                     container.style.borderColor = "rgba(52, 211, 153, 0.6)";
                 }
 
@@ -777,14 +567,9 @@ class CryptoDemo {
                 this.log(`★ DECRYPTION SUCCESS: Message authenticated & decrypted in <strong>${data.decryption_latency_us} µs</strong>!`, "success");
                 this.log(`  &bull; Recovered Plaintext: "${data.plaintext}"`, "success");
                 this.log(`=================================================================`, "success");
-
-                this.setChannelStatus(`End-to-End Secure Message Delivered and Authenticated!`, "fa-circle-check text-success");
             } else {
                 // FAILURE: Authentication Tag Mismatch (Tampered or Fake Key)
-                this.soundTamper();
                 if (container) {
-                    container.classList.remove("animate-unlock");
-                    container.classList.add("animate-tamper-shake");
                     container.style.borderColor = "rgba(244, 63, 94, 0.6)";
                 }
 
@@ -806,8 +591,6 @@ class CryptoDemo {
                 this.log(`  &bull; The ciphertext or authentication tag was modified in transit.`, "error");
                 this.log(`  &bull; Plaintext was safely discarded to protect confidentiality.`, "warning");
                 this.log(`=================================================================`, "error");
-
-                this.setChannelStatus(`[REJECTED] Decryption Aborted: Cryptographic integrity failure!`, "fa-shield-virus text-danger");
             }
 
         } catch (err) {
@@ -853,11 +636,8 @@ class CryptoDemo {
         this.lastNonceHex = null;
         this.isTampered = false;
 
-        document.getElementById("sessionBadge").textContent = "No Active Session";
-        document.getElementById("aliceEkBadge").innerHTML = `<span class="status-dot dot-cyan me-1"></span> Public Key: Not Created`;
-        document.getElementById("aliceDkBadge").innerHTML = `<span class="status-dot dot-cyan me-1"></span> Private Key: Inactive`;
-        document.getElementById("bobSecretBadge").innerHTML = `<span class="status-dot dot-amber me-1"></span> Secret (K): Not Established`;
-        document.getElementById("bobCtBadge").innerHTML = `<span class="status-dot dot-amber me-1"></span> Ciphertext: Not Built`;
+        const sessionBadge = document.getElementById("sessionBadge");
+        if (sessionBadge) sessionBadge.textContent = "No Active Session";
 
         const btnEncaps = document.getElementById("btnEncaps");
         const btnDecaps = document.getElementById("btnDecaps");
@@ -867,8 +647,6 @@ class CryptoDemo {
         if (btnDecaps) btnDecaps.disabled = true;
         if (btnVerify) btnVerify.disabled = true;
         if (btnCorrupt) btnCorrupt.disabled = true;
-
-        this.setChannelStatus(`Insecure Public Transmission Medium &bull; Ready`, "fa-wifi text-info");
 
         const statusBadge = document.getElementById("studioKeyStatusBadge");
         if (statusBadge) {
@@ -921,7 +699,6 @@ class CryptoDemo {
         const container = document.getElementById("decryptResultContainer");
         if (container) {
             container.style.borderColor = "rgba(255, 255, 255, 0.15)";
-            container.classList.remove("animate-unlock", "animate-tamper-shake");
         }
 
         if (clearLog && this.logContainer) {

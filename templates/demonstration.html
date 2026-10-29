@@ -17,11 +17,8 @@
                 </p>
             </div>
             <div class="d-flex align-items-center gap-2 mt-3 mt-md-0">
-                <button id="btnSoundToggle" class="btn btn-outline-custom btn-sm" onclick="cryptoDemo.toggleSound()">
-                    <i id="soundIcon" class="fa-solid fa-volume-high text-info me-1"></i> <span id="soundText">Sound: ON</span>
-                </button>
                 <button id="btnClearSession" class="btn btn-outline-custom btn-sm" onclick="cryptoDemo.resetDemo()">
-                    <i class="fa-solid fa-rotate-left me-1"></i> Reset All
+                    <i class="fa-solid fa-rotate-left me-1"></i> Reset Workflow
                 </button>
             </div>
         </div>
@@ -59,83 +56,6 @@
                     <div class="p-2 rounded bg-dark border border-secondary border-opacity-25 h-100">
                         <strong class="text-success d-block mb-1">4. Click "Decrypt Message"</strong>
                         Alice recovers the exact plaintext using her ML-KEM private key, proving quantum-safe end-to-end security!
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Visual Transmission Wire Stage (Animated Channel) -->
-<div class="row g-4 mb-4">
-    <div class="col-12">
-        <div class="transmission-stage">
-            <div class="row align-items-center">
-                <!-- Alice Node (Recipient) -->
-                <div class="col-lg-3 col-md-4 text-center">
-                    <div id="aliceNodeBox" class="node-box node-alice">
-                        <div id="aliceAvatar" class="node-avatar alice-avatar">
-                            <i class="fa-solid fa-user-shield"></i>
-                        </div>
-                        <h6 class="fw-bold text-white mb-1">Alice <span class="badge bg-info-subtle border border-info text-info small">Recipient</span></h6>
-                        <div class="small text-secondary mb-2" style="font-size: 0.78rem;">Holds Decapsulation Key (dk)</div>
-                        <div class="d-flex flex-column gap-1">
-                            <span id="aliceEkBadge" class="badge bg-dark border border-secondary text-secondary small py-1">
-                                <span class="status-dot dot-cyan me-1"></span> Public Key: Not Created
-                            </span>
-                            <span id="aliceDkBadge" class="badge bg-dark border border-secondary text-secondary small py-1">
-                                <span class="status-dot dot-cyan me-1"></span> Private Key: Inactive
-                            </span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Middle Insecure Transmission Channel & Flying Packets -->
-                <div class="col-lg-6 col-md-4 my-3 my-md-0">
-                    <div class="channel-container">
-                        <!-- Packet Flight Track -->
-                        <div class="packet-track position-relative w-100">
-                            <!-- Public Key Packet (Alice -> Bob) -->
-                            <div id="packetPublicKey" class="packet-pill packet-cyan">
-                                <i class="fa-solid fa-key"></i> <span id="packetEkText">Public Key (ek)</span>
-                            </div>
-                            <!-- Ciphertext Packet (Bob -> Alice) -->
-                            <div id="packetCiphertext" class="packet-pill packet-amber">
-                                <i class="fa-solid fa-box-archive"></i> <span id="packetCtText">Ciphertext (ct)</span>
-                            </div>
-                            <!-- Encrypted Message Packet (Bob -> Alice) -->
-                            <div id="packetMessage" class="packet-pill packet-green">
-                                <i class="fa-solid fa-lock"></i> <span>AES-256-GCM Payload</span>
-                            </div>
-                        </div>
-
-                        <!-- Physical Channel Wire -->
-                        <div class="channel-wire"></div>
-
-                        <!-- Channel Status Pill -->
-                        <div id="channelStatusPill" class="channel-badge mt-3">
-                            <i id="channelIcon" class="fa-solid fa-wifi text-info"></i>
-                            <span id="channelStatusText">Insecure Public Transmission Medium &bull; Ready</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Bob Node (Sender) -->
-                <div class="col-lg-3 col-md-4 text-center">
-                    <div id="bobNodeBox" class="node-box node-bob">
-                        <div id="bobAvatar" class="node-avatar bob-avatar">
-                            <i class="fa-solid fa-user-lock"></i>
-                        </div>
-                        <h6 class="fw-bold text-white mb-1">Bob <span class="badge bg-warning-subtle border border-warning text-warning small">Sender</span></h6>
-                        <div class="small text-secondary mb-2" style="font-size: 0.78rem;">Generates Shared Secret (K)</div>
-                        <div class="d-flex flex-column gap-1">
-                            <span id="bobSecretBadge" class="badge bg-dark border border-secondary text-secondary small py-1">
-                                <span class="status-dot dot-amber me-1"></span> Secret (K): Not Established
-                            </span>
-                            <span id="bobCtBadge" class="badge bg-dark border border-secondary text-secondary small py-1">
-                                <span class="status-dot dot-amber me-1"></span> Ciphertext: Not Built
-                            </span>
-                        </div>
                     </div>
                 </div>
             </div>
