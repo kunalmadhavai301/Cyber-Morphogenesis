@@ -9,8 +9,13 @@ from dataclasses import dataclass
 from typing import Dict, Any
 
 BASE_DIR = Path(__file__).resolve().parent
-DATA_DIR = BASE_DIR / "data"
-RESULTS_DIR = BASE_DIR / "results"
+if os.environ.get("VERCEL"):
+    DATA_DIR = Path("/tmp") / "data"
+    RESULTS_DIR = Path("/tmp") / "results"
+else:
+    DATA_DIR = BASE_DIR / "data"
+    RESULTS_DIR = BASE_DIR / "results"
+
 DOCS_DIR = BASE_DIR / "docs"
 
 # Ensure directories exist
